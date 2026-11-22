@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="dashboard">
+  <meta name="design-style" content="haven">
+  <title>Tibet Spring Peach Blossom, Mt. Everest &amp; Qingzang Railway Expedition (2027)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces: warm parchment & alpine mist */
+      --background: #f5f3ec;
+      --surface-container-low: #ffffff;
+      --surface-container: #e8efe9;
+      --surface-container-high: #e1e7ea;
+
+      /* Ink */
+      --on-surface: #1f2529;
+      --on-surface-variant: #58636a;
+
+      /* Rules */
+      --outline: #c3ccd1;
+      --outline-variant: #dbe1e4;
+
+      /* Accents: soft slate blue & subtle emerald */
+      --primary: #36566b;
+      --on-primary: #ffffff;
+      --primary-container: #e3ecf2;
+      --on-primary-container: #223949;
+      --secondary: #2d664f;
+      --tertiary: #3f7c63;
+      --error: #a63d32;
+      --on-error: #ffffff;
+
+      /* Semantic */
+      --positive: #2d664f;
+      --warning: #8f5e1a;
+      --warning-container: #f7efe0;
+      --focus: #36566b;
+
+      /* Data series */
+      --data-1: #36566b;
+      --data-2: #2d664f;
+      --data-3: #8f5e1a;
+      --data-4: #7b6c5c;
+      --data-context: #c3ccd1;
+
+      /* Map palette tokens (all 4 visual styles) */
+      --map-topo-bg: #dce6ec;
+      --map-topo-land: #f3efe4;
+      --map-topo-border: #b6ae9b;
+      --map-topo-plateau: #e8e1cf;
+      --map-topo-ridge: #7c8d7f;
+      --map-topo-water: #789db3;
+      --map-topo-route: #36566b;
+      --map-topo-rail: #2d664f;
+
+      --map-sat-bg: #1d2c36;
+      --map-sat-land: #384942;
+      --map-sat-border: #61746b;
+      --map-sat-plateau: #49574b;
+      --map-sat-ridge: #cfd8dc;
+      --map-sat-water: #4b7791;
+      --map-sat-route: #f0c36d;
+      --map-sat-rail: #7ad3a8;
+
+      --map-street-bg: #dfeaf2;
+      --map-street-land: #f8f9fa;
+      --map-street-border: #b8c4cc;
+      --map-street-plateau: #edf1f4;
+      --map-street-ridge: #8ea0ad;
+      --map-street-water: #6994b0;
+      --map-street-route: #284b63;
+      --map-street-rail: #2d664f;
+
+      --map-dark-bg: #0c131c;
+      --map-dark-land: #16212e;
+      --map-dark-border: #2c3e52;
+      --map-dark-plateau: #1d2b3b;
+      --map-dark-ridge: #496580;
+      --map-dark-water: #2c5270;
+      --map-dark-route: #7ab8e0;
+      --map-dark-rail: #68c49b;
+      --map-star-gold: #f5d076;
+      --map-night-sky-top: #0b1320;
+      --map-night-sky-mid: #16253b;
+      --map-night-sky-glow: #294566;
+      --map-mw-band: #6b93bd;
+      --map-star-ink: #f5e9c8;
+      --map-peak-silhouette: #0d1520;
+      --map-peak-ridge: #324963;
+
+      /* Typography */
+      --font-headline: 'Outfit', sans-serif;
+      --font-body: 'Hanken Grotesk', sans-serif;
+      --font-label: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --display-size: clamp(1.65rem, 1.35rem + 1.2vw, 2.25rem);
+      --headline-size: clamp(1.25rem, 1.08rem + 0.5vw, 1.5rem);
+      --subhead-size: clamp(1.03rem, 0.96rem + 0.25vw, 1.15rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Radii & borders */
+      --rounded: 0.375rem;
+      --rounded-lg: 0.5rem;
+      --rounded-full: 9999px;
+      --hairline: 1px solid var(--outline-variant);
+      --hairline-control: 1px solid var(--outline);
+      --elevation: none;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2.5px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .app-shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-lg);
+    }
+    .app-shell * { min-width: 0; }
+
+    /* Header / Expedition Banner */
+    .expedition-header {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .header-kicker {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      color: var(--secondary);
+      letter-spacing: 0.015em;
+      margin-bottom: var(--space-xs);
+    }
+
+    .headline {
+      font-family: var(--font-headline);
+      font-weight: 300;
+      font-size: var(--display-size);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: var(--on-surface);
+      margin: 0;
+    }
+    .headline strong { font-weight: 600; }
+
+    .sub-caption {
+      font-family: var(--font-body);
+      font-weight: 500;
+      color: var(--secondary);
+      margin: var(--space-xs) 0 0 0;
+      max-width: 68ch;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+
+    .tag-sage {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      background: var(--surface-container);
+      color: var(--secondary);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded-full);
+      white-space: nowrap;
+    }
+
+    .tag-slate {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded-full);
+      white-space: nowrap;
+    }
+
+    /* KPI Strip */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+
+    .kpi-tile {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      letter-spacing: 0.015em;
+      color: var(--on-surface-variant);
+    }
+
+    .kpi-value {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: var(--on-surface);
+      line-height: 1.2;
+    }
+
+    .kpi-note {
+      font-size: 0.8125rem;
+      color: var(--secondary);
+      font-weight: 500;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: var(--space-sm);
+      border-bottom: var(--hairline);
+      padding-bottom: var(--space-xs);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      border-radius: var(--rounded) var(--rounded) 0 0;
+      font-family: var(--font-label);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+    .tab-btn:hover {
+      background-color: var(--surface-container-high);
+      color: var(--on-surface);
+    }
+    .tab-btn[aria-selected="true"] {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background-color: var(--primary-container);
+    }
+
+    /* Tab Panels */
+    .tab-panel {
+      display: none;
+      gap: var(--space-lg);
+      animation: fadeSlide var(--dur-short) var(--ease-out);
+    }
+    .tab-panel.active {
+      display: grid;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Panels & Cards */
+    .panel {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      box-shadow: var(--elevation);
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    .panel-tinted {
+      background: var(--surface-container);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .section-heading {
+      font-family: var(--font-headline);
+      font-weight: 400;
+      font-size: var(--headline-size);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--on-surface);
+      margin: 0;
+    }
+    .section-heading strong { font-weight: 600; }
+
+    .subhead {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: var(--subhead-size);
+      letter-spacing: -0.01em;
+      margin: 0;
+      color: var(--on-surface);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: var(--hairline-control);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+    .btn:hover { background-color: var(--surface-container-high); }
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .btn-primary:hover {
+      background: var(--on-primary-container);
+      border-color: var(--on-primary-container);
+    }
+    .btn-sm {
+      min-height: 36px;
+      padding: var(--space-xs) var(--space-sm);
+      font-size: 0.8125rem;
+    }
+    .btn.active-chip {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    /* Map Workspace */
+    .map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .map-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .style-switcher {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .day-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .day-pill {
+      min-height: 38px;
+      min-width: 44px;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      border: var(--hairline-control);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .day-pill:hover { background: var(--surface-container-high); }
+    .day-pill[aria-pressed="true"] {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    #route-map {
+      width: 100%;
+      height: 480px;
+      min-height: 440px;
+      border-radius: var(--rounded-lg);
+      border: var(--hairline);
+      background-color: var(--map-topo-bg);
+      z-index: 1;
+    }
+
+    .leaflet-container {
+      font-family: var(--font-body);
+    }
+
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+      padding-top: var(--space-xs);
+      border-top: var(--hairline);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .legend-swatch {
+      width: 16px;
+      height: 4px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .stop-card-detail {
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    .admin-breadcrumb {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--secondary);
+      background: var(--surface-container);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      display: inline-block;
+      line-height: 1.4;
+    }
+
+    .mono-readout {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--on-surface-variant);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+
+    .meta-box {
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-sm);
+      background: var(--background);
+    }
+
+    .feedback-inline {
+      font-size: 0.8125rem;
+      color: var(--positive);
+      font-weight: 500;
+      min-height: 1.25rem;
+    }
+
+    /* Daily Itinerary Collapsible Cards */
+    .itinerary-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .itinerary-list {
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    .day-card {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+    }
+
+    .day-card-header {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      cursor: pointer;
+      min-height: 56px;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+    .day-card-header:hover {
+      background-color: var(--surface-container-high);
+    }
+
+    .day-badge {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+    }
+
+    .day-card-body {
+      border-top: var(--hairline);
+      padding: var(--space-md) var(--space-lg);
+      display: grid;
+      gap: var(--space-md);
+    }
+    .day-card-body[hidden] {
+      display: none;
+    }
+
+    .day-specs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+      gap: var(--space-sm);
+    }
+
+    .stops-sublist {
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .stop-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      background: var(--background);
+    }
+
+    /* Elevation Chart & Risk Zones */
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+      min-height: 340px;
+      height: 360px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+      gap: var(--space-lg);
+    }
+
+    /* Astrophotography Night Sky */
+    .astro-canvas-panel {
+      background: linear-gradient(180deg, var(--map-night-sky-top) 0%, var(--map-night-sky-mid) 65%, var(--map-night-sky-glow) 100%);
+      color: var(--on-primary);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      border: var(--hairline);
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    .astro-canvas-panel .label {
+      color: var(--map-star-gold);
+    }
+
+    .astro-svg-box {
+      width: 100%;
+      min-height: 220px;
+      border-radius: var(--rounded);
+      overflow: hidden;
+      border: 1px solid var(--map-dark-border);
+    }
+
+    .camera-settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+      gap: var(--space-sm);
+    }
+
+    .exif-box {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-md);
+    }
+
+    .checklist-grid {
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .check-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    /* Inputs & Calculators */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-md);
+      align-items: end;
+    }
+
+    .field-group {
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .field-input, .field-select {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      border: var(--hairline-control);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+    }
+
+    .range-slider {
+      width: 100%;
+      accent-color: var(--primary);
+      min-height: 36px;
+    }
+
+    /* Tables */
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9375rem;
+    }
+    table.data-table th {
+      text-align: left;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      color: var(--on-surface-variant);
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1.5px solid var(--outline);
+    }
+    table.data-table td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--hairline);
+      vertical-align: top;
+    }
+    table.data-table tbody tr:hover {
+      background: var(--surface-container-high);
+    }
+    .num-col {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .warning-banner {
+      background: var(--warning-container);
+      border-left: 3px solid var(--warning);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      color: var(--on-surface);
+    }
+
+    .footer-note {
+      border-top: var(--hairline);
+      padding-top: var(--space-lg);
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 900px) {
+      .map-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-shell {
+        padding: var(--space-sm);
+        gap: var(--space-md);
+      }
+      .expedition-header, .panel {
+        padding: var(--space-md);
+      }
+      #route-map {
+        height: 380px;
+        min-height: 360px;
+      }
+      .chart-wrapper {
+        height: 300px;
+        min-height: 280px;
+      }
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Expedition Header & Headline KPIs -->
+    <header class="expedition-header">
+      <div class="header-top">
+        <div>
+          <div class="header-kicker">Private Small-Group Package &bull; Local Guide &amp; Driver &bull; China (Sichuan, TAR, Qinghai)</div>
+          <h1 class="headline"><strong>Tibet Spring Peach Blossom</strong>, Mt. Everest &amp; Qingzang Railway</h1>
+          <p class="sub-caption">10-Day Route Dashboard &amp; Field Dossier &mdash; March 25 to April 3, 2027 (Assembling in Chengdu)</p>
+        </div>
+        <div class="tag-row">
+          <span class="tag-sage"><i data-lucide="shield-check" aria-hidden="true" style="width:15px;height:15px"></i> 100% Pure Play &bull; 0 Shopping</span>
+          <span class="tag-slate"><i data-lucide="wind" aria-hidden="true" style="width:15px;height:15px"></i> Medical Oxygen &amp; Gradual Ascent</span>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-tile">
+          <span class="label">Expedition window</span>
+          <span class="kpi-value">10 Days / 9 Nights</span>
+          <span class="kpi-note">Mar 25 &ndash; Apr 3, 2027</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="label">Surface &amp; rail distance</span>
+          <span class="kpi-value" id="kpi-surface-distance">4,056 km</span>
+          <span class="kpi-note">2,100 km road + 1,956 km rail (flights excluded)</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="label">Maximum altitude</span>
+          <span class="kpi-value">5,248 m</span>
+          <span class="kpi-note">Sleeping peak: 5,200 m at EBC / Rongbuk</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="label">Base package (twin)</span>
+          <span class="kpi-value">9,000 RMB</span>
+          <span class="kpi-note">+400 SGD flight &bull; 0 RMB EBC upgrade</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Primary Tab Navigation -->
+    <nav class="nav-tabs" role="tablist" aria-label="Expedition dashboard sections">
+      <button type="button" class="tab-btn" role="tab" id="tab-btn-map" aria-selected="true" aria-controls="panel-map" onclick="switchTab('map')">
+        <i data-lucide="map" aria-hidden="true" style="width:17px;height:17px"></i> Map &amp; Route
+      </button>
+      <button type="button" class="tab-btn" role="tab" id="tab-btn-itinerary" aria-selected="false" aria-controls="panel-itinerary" onclick="switchTab('itinerary')">
+        <i data-lucide="calendar-days" aria-hidden="true" style="width:17px;height:17px"></i> Daily Itinerary
+      </button>
+      <button type="button" class="tab-btn" role="tab" id="tab-btn-elevation" aria-selected="false" aria-controls="panel-elevation" onclick="switchTab('elevation')">
+        <i data-lucide="mountain" aria-hidden="true" style="width:17px;height:17px"></i> Elevation Profile
+      </button>
+      <button type="button" class="tab-btn" role="tab" id="tab-btn-astro" aria-selected="false" aria-controls="panel-astro" onclick="switchTab('astro')">
+        <i data-lucide="sparkles" aria-hidden="true" style="width:17px;height:17px"></i> Astrophotography &amp; Night Sky
+      </button>
+      <button type="button" class="tab-btn" role="tab" id="tab-btn-budget" aria-selected="false" aria-controls="panel-budget" onclick="switchTab('budget')">
+        <i data-lucide="wallet" aria-hidden="true" style="width:17px;height:17px"></i> Budget &amp; Expenses
+      </button>
+    </nav>
+
+    <!-- TAB 1: MAP & ROUTE -->
+    <section id="panel-map" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-map">
+      <div class="panel">
+        <div class="map-toolbar">
+          <div>
+            <h2 class="section-heading"><strong>Interactive</strong> Plateau &amp; Railway Route</h2>
+            <p class="sub-caption" style="margin-top:2px;">Vector relief basemap with contour zones, Himalayan passes, D1&ndash;D10 waypoints, and pinch/scroll zoom.</p>
+          </div>
+          <div class="style-switcher" role="group" aria-label="Base map visual mode">
+            <button type="button" class="btn btn-sm active-chip" id="style-btn-topo" onclick="setMapStyle('topo')">Topographic</button>
+            <button type="button" class="btn btn-sm" id="style-btn-satellite" onclick="setMapStyle('satellite')">Satellite</button>
+            <button type="button" class="btn btn-sm" id="style-btn-street" onclick="setMapStyle('street')">Standard Street</button>
+            <button type="button" class="btn btn-sm" id="style-btn-dark" onclick="setMapStyle('dark')">Dark Stargazing</button>
+          </div>
+        </div>
+
+        <div class="map-toolbar">
+          <div class="day-pills" role="group" aria-label="Filter route by expedition day">
+            <button type="button" class="day-pill" id="day-filter-all" aria-pressed="true" onclick="selectMapDay('all')">All D1&ndash;D10</button>
+            <button type="button" class="day-pill" id="day-filter-1" aria-pressed="false" onclick="selectMapDay(1)">D1</button>
+            <button type="button" class="day-pill" id="day-filter-2" aria-pressed="false" onclick="selectMapDay(2)">D2</button>
+            <button type="button" class="day-pill" id="day-filter-3" aria-pressed="false" onclick="selectMapDay(3)">D3</button>
+            <button type="button" class="day-pill" id="day-filter-4" aria-pressed="false" onclick="selectMapDay(4)">D4</button>
+            <button type="button" class="day-pill" id="day-filter-5" aria-pressed="false" onclick="selectMapDay(5)">D5</button>
+            <button type="button" class="day-pill" id="day-filter-6" aria-pressed="false" onclick="selectMapDay(6)">D6</button>
+            <button type="button" class="day-pill" id="day-filter-7" aria-pressed="false" onclick="selectMapDay(7)">D7</button>
+            <button type="button" class="day-pill" id="day-filter-8" aria-pressed="false" onclick="selectMapDay(8)">D8</button>
+            <button type="button" class="day-pill" id="day-filter-9" aria-pressed="false" onclick="selectMapDay(9)">D9</button>
+            <button type="button" class="day-pill" id="day-filter-10" aria-pressed="false" onclick="selectMapDay(10)">D10</button>
+          </div>
+          <div style="display:flex;gap:var(--space-xs);flex-wrap:wrap;">
+            <button type="button" class="btn btn-sm" id="btn-toggle-wheel" onclick="toggleScrollWheelZoom()">
+              <i data-lucide="mouse" aria-hidden="true" style="width:14px;height:14px"></i> <span id="wheel-label">Scroll Zoom: On</span>
+            </button>
+            <button type="button" class="btn btn-sm" onclick="fitFullRoute()">
+              <i data-lucide="maximize-2" aria-hidden="true" style="width:14px;height:14px"></i> Reset View
+            </button>
+          </div>
+        </div>
+
+        <div class="map-layout">
+          <div>
+            <div id="route-map" aria-label="Interactive vector route map across China, Sichuan, Tibet Autonomous Region, and Qinghai"></div>
+            <div class="map-legend">
+              <span class="legend-item"><span class="legend-swatch" style="background:var(--map-topo-route);"></span> Overland Tour Vehicle (2,100 km)</span>
+              <span class="legend-item"><span class="legend-swatch" style="background:var(--map-topo-rail);"></span> Qingzang Railway Soft Sleeper (1,956 km)</span>
+              <span class="legend-item"><span class="legend-swatch" style="border-top:2px dashed var(--on-surface-variant);height:0;"></span> Flight Corridor (Distance Excluded)</span>
+              <span class="legend-item"><span class="legend-swatch" style="background:var(--map-topo-plateau);border:1px solid var(--outline);"></span> 4,000m+ Tibetan Plateau Relief</span>
+            </div>
+          </div>
+
+          <aside class="panel" style="background:var(--background);" id="map-stop-inspector" aria-live="polite">
+            <div class="stop-card-detail" id="stop-inspector-content">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: DAILY ITINERARY -->
+    <section id="panel-itinerary" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-itinerary">
+      <div class="panel">
+        <div class="itinerary-controls">
+          <div>
+            <h2 class="section-heading"><strong>10-Day Detailed</strong> Expedition Itinerary</h2>
+            <p class="sub-caption" style="margin-top:2px;">Administrative locations, overland/rail distances (excluding flights), meals, oxygenated hotels, and GPS search queries.</p>
+          </div>
+          <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
+            <button type="button" class="btn btn-sm" onclick="toggleAllDays(true)">Expand All Days</button>
+            <button type="button" class="btn btn-sm" onclick="toggleAllDays(false)">Collapse All</button>
+          </div>
+        </div>
+
+        <div class="itinerary-list" id="itinerary-cards-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: ELEVATION PROFILE -->
+    <section id="panel-elevation" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-elevation">
+      <div class="panel">
+        <div>
+          <h2 class="section-heading"><strong>Plateau Altitude</strong> &amp; Acclimatization Profile</h2>
+          <p class="sub-caption" style="margin-top:2px;">Whole-meter elevation progression designed with a low-altitude Nyingchi entry (2,900 m) before ascending to Lhasa, Shigatse, and Everest Base Camp.</p>
+        </div>
+
+        <div class="chart-wrapper">
+          <canvas id="elevationChart" aria-label="Line chart of expedition altitude profile in meters"></canvas>
+        </div>
+
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Waypoint</th>
+                <th>Administrative Region</th>
+                <th>Expedition Day</th>
+                <th class="num-col">Altitude (m)</th>
+                <th>Acclimatization Band &amp; Support</th>
+              </tr>
+            </thead>
+            <tbody id="elevation-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <div class="panel">
+          <h3 class="subhead">Oxygen &amp; Vehicle Support Protocol</h3>
+          <ul style="margin:0;padding-left:1.25rem;display:grid;gap:var(--space-xs);">
+            <li><strong>Personal 1.4L Medical Carbon-Fiber Cylinder:</strong> 1 bottle gifted per traveler (medical-grade purity, 6&ndash;10 hours continuous flow).</li>
+            <li><strong>Portable Spray Oxygen Cans:</strong> 2 &times; 1,000 ml handheld cans per traveler for passes &amp; walking tours.</li>
+            <li><strong>Onboard Coach Reserves:</strong> 1 large medical steel cylinder plus oral glucose ampoules carried in the 9&ndash;17 seat tour vehicle.</li>
+            <li><strong>Oxygenated Hotels:</strong> Diffused &amp; nasal oxygen plus humidifiers in Lhasa (3 nights), smart oxygen &amp; humidifiers in Shigatse (2 nights), and heated oxygen rooms at EBC / Rongbuk.</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h3 class="subhead">CDC Yellow Book Acclimatization Checklist</h3>
+          <ul style="margin:0;padding-left:1.25rem;display:grid;gap:var(--space-xs);">
+            <li><strong>Gradual Entry:</strong> Fly into Nyingchi (2,900 m) for initial adaptation rather than landing directly in Lhasa (3,650 m).</li>
+            <li><strong>First 48 Hours:</strong> Avoid alcohol completely, keep physical exertion mild, and hydrate steadily in dry plateau air.</li>
+            <li><strong>Caffeine &amp; Medication:</strong> Regular caffeine drinkers should maintain normal intake to prevent withdrawal headaches; consult a physician regarding acetazolamide prophylaxis.</li>
+            <li><strong>Symptom Rule:</strong> Never ascend to sleep at a higher altitude if experiencing headache, nausea, or dizziness.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ASTROPHOTOGRAPHY & NIGHT SKY -->
+    <section id="panel-astro" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-astro">
+      <div class="astro-canvas-panel">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:var(--space-md);">
+          <div>
+            <div class="label">Day 5 Night &bull; March 29, 2027 &bull; China &rsaquo; TAR &rsaquo; Shigatse &rsaquo; EBC / Rongbuk Monastery (5,200 m)</div>
+            <h2 class="section-heading" style="color:var(--on-primary);margin-top:var(--space-xs);"><strong>Everest Base Camp</strong> Milky Way &amp; Stargazing Guide</h2>
+          </div>
+          <span class="tag-slate" style="background:var(--map-dark-border);color:var(--map-star-gold);">
+            <i data-lucide="moon-star" aria-hidden="true" style="width:15px;height:15px"></i> Clear Plateau Skies &bull; -15&deg;C to -18&deg;C Night
+          </span>
+        </div>
+
+        <div class="astro-svg-box">
+          <svg viewBox="0 0 800 220" width="100%" height="220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs>
+              <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" style="stop-color:var(--map-night-sky-top)"/>
+                <stop offset="65%" style="stop-color:var(--map-night-sky-mid)"/>
+                <stop offset="100%" style="stop-color:var(--map-night-sky-glow)"/>
+              </linearGradient>
+              <linearGradient id="mwBand" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0%" style="stop-color:var(--map-night-sky-glow);stop-opacity:0"/>
+                <stop offset="50%" style="stop-color:var(--map-mw-band);stop-opacity:0.32"/>
+                <stop offset="100%" style="stop-color:var(--map-night-sky-glow);stop-opacity:0"/>
+              </linearGradient>
+            </defs>
+            <rect width="800" height="220" fill="url(#skyGrad)"/>
+            <path d="M120,210 Q360,95 690,10 L760,30 Q430,130 220,220 Z" fill="url(#mwBand)"/>
+            <!-- Procedural stars -->
+            <g style="fill:var(--map-star-ink);opacity:0.9">
+              <circle cx="95" cy="42" r="1.4"/><circle cx="140" cy="88" r="1"/><circle cx="215" cy="30" r="1.6"/>
+              <circle cx="275" cy="70" r="1.2"/><circle cx="330" cy="22" r="1"/><circle cx="395" cy="58" r="1.8"/>
+              <circle cx="445" cy="96" r="1.2"/><circle cx="510" cy="44" r="1.5"/><circle cx="568" cy="25" r="2"/>
+              <circle cx="620" cy="66" r="1.3"/><circle cx="685" cy="35" r="1.7"/><circle cx="740" cy="80" r="1.1"/>
+              <circle cx="480" cy="75" r="1"/><circle cx="535" cy="60" r="1.1"/><circle cx="645" cy="18" r="1.3"/>
+              <circle cx="180" cy="115" r="1"/><circle cx="305" cy="105" r="1.2"/><circle cx="715" cy="112" r="1.4"/>
+            </g>
+            <!-- Mt. Everest North Face Silhouette -->
+            <path d="M0,220 L0,175 L110,152 L210,168 L325,112 L405,76 L465,118 L560,145 L675,130 L800,165 L800,220 Z" style="fill:var(--map-peak-silhouette)"/>
+            <path d="M405,76 L438,108 L412,115 L388,104 Z" style="fill:var(--map-peak-ridge);opacity:0.55"/>
+            <text x="405" y="64" text-anchor="middle" style="fill:var(--map-star-gold)" font-family="Outfit, sans-serif" font-size="11" font-weight="500">Mt. Everest North Face (8,848 m) above 5,200 m EBC</text>
+          </svg>
+        </div>
+
+        <p style="margin:0;color:var(--primary-container);max-width:70ch;">
+          At 5,200 m above sea level with minimal atmospheric moisture and negligible light pollution, the Rongbuk Monastery &amp; EBC valley offers extraordinary clarity of the Milky Way galactic core rising above the Himalayan horizon in late March pre-dawn hours.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3 class="subhead">Recommended Milky Way Camera Settings (DSLR / Mirrorless &amp; Pro Phone Mode)</h3>
+        <div class="camera-settings-grid">
+          <div class="exif-box">
+            <div class="label">Shooting mode</div>
+            <div class="kpi-value" style="font-size:1.15rem;">Manual (M)</div>
+            <div class="kpi-note">Full manual exposure control</div>
+          </div>
+          <div class="exif-box">
+            <div class="label">Aperture</div>
+            <div class="kpi-value" style="font-size:1.15rem;">f/1.4 &ndash; f/2.8</div>
+            <div class="kpi-note">Wide open for light gathering</div>
+          </div>
+          <div class="exif-box">
+            <div class="label">Shutter speed</div>
+            <div class="kpi-value" style="font-size:1.15rem;">15 &ndash; 20 s</div>
+            <div class="kpi-note">Pinpoint stars, minimal trail</div>
+          </div>
+          <div class="exif-box">
+            <div class="label">ISO sensitivity</div>
+            <div class="kpi-value" style="font-size:1.15rem;">ISO 3200 &ndash; 6400</div>
+            <div class="kpi-note">Balance noise vs. faint dust lanes</div>
+          </div>
+          <div class="exif-box">
+            <div class="label">White balance</div>
+            <div class="kpi-value" style="font-size:1.15rem;">3800K &ndash; 4200K</div>
+            <div class="kpi-note">Cool natural night sky tone</div>
+          </div>
+          <div class="exif-box">
+            <div class="label">Format &amp; IS</div>
+            <div class="kpi-value" style="font-size:1.15rem;">RAW &bull; IS OFF</div>
+            <div class="kpi-note">Disable stabilization on tripod</div>
+          </div>
+        </div>
+
+        <div class="warning-banner">
+          <strong>Essential Gear Reminder &mdash; Tripod Required:</strong> Long exposures of 15&ndash;20 seconds cannot be handheld. Pack a <strong>sturdy travel tripod</strong> for cameras, or a <strong>smartphone tripod mount / extendable selfie-stick tripod</strong> with Bluetooth remote or 2-second self-timer. Keep spare camera/phone batteries in an inner warm pocket until shooting, as nighttime lows at EBC reach <strong>-15&deg;C to -18&deg;C</strong>.
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <div class="panel">
+          <h3 class="subhead">500-Rule Shutter Calculator</h3>
+          <p style="margin:0;color:var(--on-surface-variant);">Check the maximum exposure before Earth's rotation turns stars into streaks.</p>
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="label" for="astro-focal">Lens focal length (full-frame eq., mm)</label>
+              <input type="range" id="astro-focal-slider" class="range-slider" min="12" max="50" step="1" value="18" oninput="syncFocalFromSlider(this.value)">
+              <input type="number" id="astro-focal" class="field-input" min="12" max="50" value="18" oninput="syncFocalFromNumber(this.value)">
+            </div>
+            <div class="field-group">
+              <label class="label" for="astro-sensor">Sensor crop factor</label>
+              <select id="astro-sensor" class="field-select" onchange="updateAstroCalc()">
+                <option value="1">Full Frame (1.0&times;)</option>
+                <option value="1.5">APS-C (1.5&times;)</option>
+                <option value="1.6">Canon APS-C (1.6&times;)</option>
+                <option value="2">Micro Four Thirds (2.0&times;)</option>
+              </select>
+            </div>
+          </div>
+          <div class="panel-tinted" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--space-sm);">
+            <div>
+              <div class="label">Max star-pinpoint shutter</div>
+              <div class="kpi-value" id="astro-shutter-out">27 s (Target 15&ndash;20 s)</div>
+            </div>
+            <div class="kpi-note" id="astro-advice-out">Ideal for crisp Milky Way over Mt. Everest</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3 class="subhead">EBC Night-Sky &amp; Cold-Weather Checklist</h3>
+            <span class="mono-readout" id="astro-check-progress">0 / 6 packed</span>
+          </div>
+          <div class="checklist-grid" id="astro-checklist">
+            <!-- Rendered by JS & persisted -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: BUDGET & EXPENSES -->
+    <section id="panel-budget" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-budget">
+      <div class="card-grid">
+        <div class="panel">
+          <h2 class="section-heading"><strong>Expense Summary</strong> &amp; Personal Calculator</h2>
+          <p class="sub-caption" style="margin:0;">Interactive cost estimator combining tour package, room option, 16 self-paid meals, optional extras, and airfare.</p>
+
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="label" for="budget-room-type">Room accommodation</label>
+              <select id="budget-room-type" class="field-select" onchange="recalcBudget()">
+                <option value="0">Twin Sharing (9,000 RMB base)</option>
+                <option value="1100">Private Single Room (+1,100 RMB)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="label" for="budget-fx">Exchange rate (RMB per 1 SGD)</label>
+              <input type="number" id="budget-fx" class="field-input" min="4.0" max="7.0" step="0.05" value="5.35" oninput="recalcBudget()">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="label" for="budget-extras-slider">Optional allowance for drinks, snacks &amp; add-on dishes (RMB)</label>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:var(--space-sm);align-items:center;">
+              <input type="range" id="budget-extras-slider" class="range-slider" min="0" max="600" step="20" value="160" oninput="syncExtrasFromSlider(this.value)">
+              <input type="number" id="budget-extras-num" class="field-input" min="0" max="2000" step="10" value="160" oninput="syncExtrasFromNumber(this.value)">
+            </div>
+          </div>
+
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Cost Component</th>
+                  <th>Notes</th>
+                  <th class="num-col">RMB</th>
+                  <th class="num-col">SGD Eq.</th>
+                </tr>
+              </thead>
+              <tbody id="budget-breakdown-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3 class="subhead">Package Inclusions &amp; Meal Coverage</h3>
+          <div class="panel-tinted" style="display:grid;gap:var(--space-xs);">
+            <div class="label" style="color:var(--secondary);">Meals Coverage Breakdown</div>
+            <p style="margin:0;"><strong>Included:</strong> 8 daily hotel breakfasts (D2&ndash;D9), <strong>2 gifted specialty main meals</strong> (Day 2 Lulang Stone Pot Chicken + Day 5 Mt. Everest Hot Pot), and <strong>Day 8 Potala Palace Rooftop Afternoon Tea</strong>.</p>
+            <p style="margin:0;"><strong>Self-Paid Baseline:</strong> 16 unincluded lunches &amp; dinners calculated at 30 RMB per meal (<strong>480 RMB total</strong>), plus your optional extra allowance for drinks and add-on dishes.</p>
+          </div>
+
+          <ul style="margin:0;padding-left:1.25rem;display:grid;gap:var(--space-xs);">
+            <li><strong>EBC / Rongbuk Stay:</strong> Fully included in base package (<strong>0 RMB upgrade fee</strong>).</li>
+            <li><strong>Permits &amp; Entry Tickets:</strong> Tibet Travel Permits (TTP), Alien Travel Permits (ATP), and all scheduled scenic tickets &amp; eco-buses.</li>
+            <li><strong>Domestic Transit Included:</strong> Chengdu&ndash;Nyingchi flight, Qingzang Railway soft-sleeper cabin (Lhasa&ndash;Xining), and Xining&ndash;Chengdu flight.</li>
+            <li><strong>Hotels &amp; Transport:</strong> 4-star oxygenated hotels throughout, 9&ndash;17 seat licensed tour coach, licensed guide &amp; driver tips, and 500,000 RMB personal travel accident insurance.</li>
+          </ul>
+
+          <div style="border-top:var(--hairline);padding-top:var(--space-md);display:grid;gap:var(--space-sm);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3 class="subhead">3-Stage Payment Milestone Tracker</h3>
+              <span class="mono-readout" id="payment-progress-label">0 / 3 settled</span>
+            </div>
+            <div class="checklist-grid" id="payment-milestones">
+              <!-- Populated by JS & persisted -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer-note">
+      <span>Sources: 2027 Tibet Nyingchi Peach Blossom 10-Day Private Tour Contract (GF-2026-2401), Huage Private Small-Group Itinerary, CDC Yellow Book High-Altitude Guidelines, and Natural Earth Boundaries (public domain).</span>
+      <span>Distances exclude flights (Chengdu&ndash;Nyingchi &amp; Xining&ndash;Chengdu). All altitudes in whole meters.</span>
+    </footer>
+  </div>
+
+  <api-shim></api-shim>
+  <script>
+    // =========================================================================
+    // DATA DEFINITIONS (Backticks for all strings; zero raw newlines in quotes)
+    // =========================================================================
+    const EXPEDITION_DAYS = [
+      {
+        day: 1,
+        date: `Mar 25, 2027`,
+        title: `Chengdu Assembly & Transit Hotel`,
+        country: `China`,
+        province: `Sichuan Province`,
+        city: `Chengdu`,
+        route: `Arrive in Chengdu Airport → Private transfer to transit hotel`,
+        altitude: 500,
+        passAltitude: null,
+        distanceKm: 35,
+        travelMode: `Airport transfer`,
+        meals: `Self-paid (Lunch & Dinner not included)`,
+        hotel: `Chengdu Tianfu Hotel / Shuangliu Holiday Inn Express or similar`,
+        highlights: `Assemble in Chengdu. Early arrivals before 2:00 PM check-in can send luggage via driver to the hotel and take the metro or shuttle into town.`,
+        coords: [30.5728, 104.0668],
+        stops: [
+          { name: `Chengdu Tianfu / Shuangliu Transit Hub`, admin: `China › Sichuan Province › Chengdu`, lat: 30.5728, lng: 104.0668, alt: 500 }
+        ]
+      },
+      {
+        day: 2,
+        date: `Mar 26, 2027`,
+        title: `Fly to Nyingchi, Sejila Pass, Lulang Forest & Gala Peach Blossom Village`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        city: `Nyingchi (Mainling)`,
+        route: `Chengdu ✈ Nyingchi (flight excluded) → Sejila Pass → Lulang Forest → Gala Peach Blossom Village → Nyingchi`,
+        altitude: 2900,
+        passAltitude: 4728,
+        distanceKm: 180,
+        travelMode: `Tour coach (flight leg excluded)`,
+        meals: `Hotel breakfast + Gifted Lulang Stone Pot Chicken (dinner self-paid)`,
+        hotel: `Nyingchi Liyuan Hotel or similar`,
+        highlights: `Low-altitude entry at 2,900 m ("Jiangnan of Tibet") supports smooth acclimatization. Cross Sejila Pass (4,728 m) to view Mt. Namcha Barwa, stroll Lulang Forest alpine meadows, and explore pink wild peach groves in Gala Village.`,
+        coords: [29.6491, 94.3615],
+        stops: [
+          { name: `Nyingchi Mainling Valley`, admin: `China › TAR › Nyingchi (Mainling)`, lat: 29.6491, lng: 94.3615, alt: 2900 },
+          { name: `Sejila Pass (Mt. Namcha Barwa View)`, admin: `China › TAR › Nyingchi`, lat: 29.6186, lng: 94.6486, alt: 4728 },
+          { name: `Lulang Forest`, admin: `China › TAR › Nyingchi`, lat: 29.7667, lng: 94.7333, alt: 3380 },
+          { name: `Gala Peach Blossom Village`, admin: `China › TAR › Nyingchi`, lat: 29.6075, lng: 94.4558, alt: 2980 }
+        ]
+      },
+      {
+        day: 3,
+        date: `Mar 27, 2027`,
+        title: `Xiuba Ancient Castle, Bahe Temple & Basum Tso to Lhasa`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        city: `Nyingchi → Lhasa`,
+        route: `Nyingchi → Xiuba Castle / Fairy Valley → Bahe Temple → Basum Tso Lake → Lhasa`,
+        altitude: 3650,
+        passAltitude: 5013,
+        distanceKm: 500,
+        travelMode: `Tour coach`,
+        meals: `Hotel breakfast (Lunch & Dinner self-paid)`,
+        hotel: `Lhasa Depeng / Jimi Hotel or similar (diffused + nasal oxygen & humidifier)`,
+        highlights: `Visit 1,600-year-old Xiuba Ancient Castle (or Fairy Valley wild peach blossoms) and red-walled Bahe Temple before touring emerald Basum Tso sacred lake and arriving in Lhasa via the scenic Nyingchi–Lhasa corridor.`,
+        coords: [30.0047, 93.9278],
+        stops: [
+          { name: `Xiuba Ancient Castle`, admin: `China › TAR › Nyingchi › Gongbo'gyamda`, lat: 29.8742, lng: 93.6431, alt: 3400 },
+          { name: `Basum Tso Sacred Lake`, admin: `China › TAR › Nyingchi › Gongbo'gyamda`, lat: 30.0047, lng: 93.9278, alt: 3480 },
+          { name: `Lhasa City`, admin: `China › TAR › Lhasa`, lat: 29.6525, lng: 91.1721, alt: 3650 }
+        ]
+      },
+      {
+        day: 4,
+        date: `Mar 28, 2027`,
+        title: `Yamdrok Lake & Karola Glacier to Shigatse`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        city: `Shannan → Shigatse`,
+        route: `Lhasa → Kampala Pass → Yamdrok Lake → Karola Glacier → Shigatse`,
+        altitude: 3840,
+        passAltitude: 4990,
+        distanceKm: 360,
+        travelMode: `Tour coach`,
+        meals: `Hotel breakfast (Lunch & Dinner self-paid)`,
+        hotel: `Shigatse Yunzuo Starlight Hotel or similar (humidifier & smart oxygen)`,
+        highlights: `Overlook sapphire Yamdrok Lake (4,441 m), one of Tibet's three great sacred lakes, then stop below the towering hanging ice wall of Karola Glacier before descending to Shigatse.`,
+        coords: [29.0764, 90.6922],
+        stops: [
+          { name: `Yamdrok Lake Viewpoint`, admin: `China › TAR › Shannan › Nagarze`, lat: 29.0764, lng: 90.6922, alt: 4441 },
+          { name: `Karola Glacier`, admin: `China › TAR › Shannan / Shigatse`, lat: 28.9061, lng: 90.1819, alt: 5020 },
+          { name: `Shigatse City`, admin: `China › TAR › Shigatse`, lat: 29.2669, lng: 88.8806, alt: 3840 }
+        ]
+      },
+      {
+        day: 5,
+        date: `Mar 29, 2027`,
+        title: `Sakya Monastery, Gawula Pass & Everest Base Camp (Rongbuk)`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        city: `Shigatse › Tingri (EBC)`,
+        route: `Shigatse → Sakya Monastery → Tingri → Gawula Pass → Everest Base Camp / Rongbuk`,
+        altitude: 5200,
+        passAltitude: 5211,
+        distanceKm: 350,
+        travelMode: `Tour coach + Scenic eco-bus`,
+        meals: `Hotel breakfast + Gifted Mt. Everest Hot Pot (Lunch self-paid)`,
+        hotel: `Rongbuk Monastery Hotel / Everest Town Vienna International Hotel (0 RMB upgrade)`,
+        highlights: `Admire ancient murals at Sakya Monastery, view five 8,000 m+ Himalayan peaks simultaneously from Gawula Pass (5,211 m), enjoy hot pot at EBC (5,200 m), and shoot the Milky Way at night.`,
+        coords: [28.1967, 86.8292],
+        stops: [
+          { name: `Sakya Monastery`, admin: `China › TAR › Shigatse › Sakya`, lat: 28.9006, lng: 88.0211, alt: 4310 },
+          { name: `Gawula Pass (5× 8,000m Panorama)`, admin: `China › TAR › Shigatse › Tingri`, lat: 28.3489, lng: 86.7847, alt: 5211 },
+          { name: `Everest Base Camp & Rongbuk Monastery`, admin: `China › TAR › Shigatse › Tingri`, lat: 28.1967, lng: 86.8292, alt: 5200 }
+        ]
+      },
+      {
+        day: 6,
+        date: `Mar 30, 2027`,
+        title: `Everest Sunrise & Gyatso La Pass Return to Shigatse`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        city: `Tingri → Shigatse`,
+        route: `Everest Base Camp Sunrise → Gyatso La Pass → G318 Highway → Shigatse`,
+        altitude: 3840,
+        passAltitude: 5248,
+        distanceKm: 340,
+        travelMode: `Tour coach`,
+        meals: `Hotel breakfast (Lunch & Dinner self-paid)`,
+        hotel: `Shigatse Yunzuo Starlight Hotel or similar`,
+        highlights: `Catch the golden dawn light across Mount Everest's North Face before crossing Gyatso La Pass (5,248 m) back along G318 Highway to Shigatse for rest.`,
+        coords: [28.8856, 87.4567],
+        stops: [
+          { name: `Gyatso La Pass (G318 Summit)`, admin: `China › TAR › Shigatse › Lhatse`, lat: 28.8856, lng: 87.4567, alt: 5248 },
+          { name: `Shigatse City`, admin: `China › TAR › Shigatse`, lat: 29.2669, lng: 88.8806, alt: 3840 }
+        ]
+      },
+      {
+        day: 7,
+        date: `Mar 31, 2027`,
+        title: `Tashilhunpo Monastery & Yarlung Tsangpo Valley to Lhasa`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        city: `Shigatse → Lhasa`,
+        route: `Shigatse → Tashilhunpo Monastery → Yarlung Tsangpo River Valley → Lhasa`,
+        altitude: 3650,
+        passAltitude: null,
+        distanceKm: 280,
+        travelMode: `Tour coach`,
+        meals: `Hotel breakfast (Lunch & Dinner self-paid)`,
+        hotel: `Lhasa Depeng / Jimi Hotel or similar (oxygenated)`,
+        highlights: `Morning visit to Tashilhunpo Monastery (seat of the Panchen Lamas and home to the world's largest bronze Maitreya Buddha), then drive along the Yarlung Tsangpo River Valley back to Lhasa.`,
+        coords: [29.2672, 88.8703],
+        stops: [
+          { name: `Tashilhunpo Monastery`, admin: `China › TAR › Shigatse`, lat: 29.2672, lng: 88.8703, alt: 3840 },
+          { name: `Lhasa City`, admin: `China › TAR › Lhasa`, lat: 29.6525, lng: 91.1721, alt: 3650 }
+        ]
+      },
+      {
+        day: 8,
+        date: `Apr 1, 2027`,
+        title: `Lhasa Pilgrimage: Potala Palace, Jokhang Temple & Barkhor Street`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        city: `Lhasa`,
+        route: `Potala Palace (Afternoon Tea) → Yaowang Mountain Viewpoint → Jokhang Temple → Barkhor Street`,
+        altitude: 3650,
+        passAltitude: null,
+        distanceKm: 25,
+        travelMode: `Local city coach`,
+        meals: `Hotel breakfast + Potala Palace Rooftop Afternoon Tea (Lunch & Dinner self-paid)`,
+        hotel: `Lhasa Depeng / Jimi Hotel or similar`,
+        highlights: `Guided Potala Palace tour with headsets, rooftop afternoon tea overlooking the palace, classic 50 RMB banknote photo at Chakpori (Yaowang Mountain), and kora walk around Jokhang Temple & Barkhor Street.`,
+        coords: [29.6555, 91.1186],
+        stops: [
+          { name: `Potala Palace`, admin: `China › TAR › Lhasa`, lat: 29.6555, lng: 91.1186, alt: 3700 },
+          { name: `Yaowang Mountain (Chakpori) Viewpoint`, admin: `China › TAR › Lhasa`, lat: 29.6522, lng: 91.1131, alt: 3680 },
+          { name: `Jokhang Temple & Barkhor Street`, admin: `China › TAR › Lhasa`, lat: 29.6531, lng: 91.1322, alt: 3650 }
+        ]
+      },
+      {
+        day: 9,
+        date: `Apr 2, 2027`,
+        title: `Qingzang Railway Soft-Sleeper Crossing to Xining`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR) → Qinghai Province`,
+        city: `Lhasa → Nagqu → Tanggula → Golmud`,
+        route: `Lhasa Station 🚆 Cuona Lake → Tanggula Pass → Tuotuo River → Hoh Xil (Kekexili)`,
+        altitude: 5072,
+        passAltitude: 5072,
+        distanceKm: 1956,
+        travelMode: `Qingzang Railway Soft Sleeper`,
+        meals: `Hotel breakfast (Train Lunch & Dinner self-paid)`,
+        hotel: `Qingzang Railway 4-Berth Soft Sleeper Cabin (overnight)`,
+        highlights: `Board the iconic plateau train across northern Tibet's Changtang grasslands, past Cuona Lake and over Tanggula Pass (5,072 m)—the highest railway pass on Earth—and through the Hoh Xil wildlife reserve.`,
+        coords: [32.8753, 91.9161],
+        stops: [
+          { name: `Tanggula Railway Pass`, admin: `China › TAR / Qinghai Border`, lat: 32.8753, lng: 91.9161, alt: 5072 },
+          { name: `Hoh Xil (Kekexili) Nature Reserve Corridor`, admin: `China › Qinghai Province › Yushu`, lat: 35.2167, lng: 93.0667, alt: 4600 }
+        ]
+      },
+      {
+        day: 10,
+        date: `Apr 3, 2027`,
+        title: `Arrive Xining & Flight to Chengdu (Tour Concludes)`,
+        country: `China`,
+        province: `Qinghai Province → Sichuan Province`,
+        city: `Xining → Chengdu`,
+        route: `Arrive Xining Station → Airport Transfer → Fly Xining ✈ Chengdu (flight excluded)`,
+        altitude: 2260,
+        passAltitude: null,
+        distanceKm: 30,
+        travelMode: `Station-to-airport transfer (flight leg excluded)`,
+        meals: `Self-paid`,
+        hotel: `Independent / Homeward departure from Chengdu`,
+        highlights: `Morning arrival in Xining (2,260 m), capital of Qinghai Province, followed by transfer to Xining Caojiabao Airport for the included flight back to Chengdu (500 m).`,
+        coords: [36.6171, 101.7782],
+        stops: [
+          { name: `Xining Railway Station & Hub`, admin: `China › Qinghai Province › Xining`, lat: 36.6171, lng: 101.7782, alt: 2260 },
+          { name: `Chengdu Return Hub`, admin: `China › Sichuan Province › Chengdu`, lat: 30.5728, lng: 104.0668, alt: 500 }
+        ]
+      }
+    ];
+
+    const ELEVATION_POINTS = [
+      { label: `Chengdu`, admin: `China › Sichuan`, day: `D1 / D10`, alt: 500, band: `Lowland baseline (<1,200 m)` },
+      { label: `Nyingchi`, admin: `China › TAR`, day: `D2`, alt: 2900, band: `Moderate altitude — initial adaptation` },
+      { label: `Lhasa`, admin: `China › TAR`, day: `D3 / D7–D8`, alt: 3650, band: `High altitude — diffused oxygen hotels` },
+      { label: `Yamdrok Lake`, admin: `China › TAR`, day: `D4`, alt: 4441, band: `Very high day pass — pace walking slowly` },
+      { label: `Shigatse`, admin: `China › TAR`, day: `D4 / D6`, alt: 3840, band: `High altitude — recovery sleep zone` },
+      { label: `Gawula Pass`, admin: `China › TAR`, day: `D5`, alt: 5211, band: `Extreme pass — brief photo stop only` },
+      { label: `EBC / Rongbuk`, admin: `China › TAR`, day: `D5`, alt: 5200, band: `Extreme sleeping altitude — heated O2 stay` },
+      { label: `Tanggula Pass`, admin: `China › TAR/Qinghai`, day: `D9`, alt: 5072, band: `Extreme rail summit — cabin O2 available` },
+      { label: `Xining`, admin: `China › Qinghai`, day: `D10`, alt: 2260, band: `Moderate plateau descent — rapid recovery` }
+    ];
+
+    const ASTRO_CHECKLIST_ITEMS = [
+      { id: `tripod`, label: `Sturdy travel tripod OR smartphone tripod mount / selfie-stick tripod (mandatory for 15–20 s exposures)` },
+      { id: `lens`, label: `Wide-angle fast lens (14–24 mm, f/1.4–f/2.8) or smartphone Pro / Night RAW mode` },
+      { id: `batteries`, label: `2+ spare camera batteries & power bank stored in warm inner pocket (-15°C to -18°C cold drain)` },
+      { id: `headlamp`, label: `Red-light headlamp + spare gloves (preserve night vision & protect fingers)` },
+      { id: `shutter`, label: `Intervalometer / Bluetooth remote or 2-second self-timer enabled` },
+      { id: `oxygen`, label: `1.4L portable medical oxygen bottle & insulated thermos with warm water` }
+    ];
+
+    const PAYMENT_MILESTONES_DATA = [
+      { id: `stage1`, title: `Stage 1: Booking Deposit (1,000 RMB / pax)`, detail: `Paid upon digital National Electronic Contract review & passport upload (Nov–Dec 2026).` },
+      { id: `stage2`, title: `Stage 2: Permit Approval Tranche (4,000 RMB / pax)`, detail: `Paid ONLY after official Tibet Travel Permit (TTP) issuance (~30–40 days pre-departure).` },
+      { id: `stage3`, title: `Stage 3: Arrival Balance Settlement (4,000 RMB + Room Supp.)`, detail: `Paid on arrival Day 1/2 in Chengdu/Tibet with official stamped receipt.` }
+    ];
+
+    // =========================================================================
+    // PERSISTED STATE (notebookAppApi via <api-shim>)
+    // =========================================================================
+    const DEFAULT_STATE = {
+      activeTab: `map`,
+      mapStyle: `topo`,
+      selectedDay: `all`,
+      scrollWheelZoom: true,
+      roomSupplement: 0,
+      fxRate: 5.35,
+      extrasRmb: 160,
+      focalLength: 18,
+      sensorCrop: 1,
+      astroChecklist: {},
+      paymentChecklist: {}
+    };
+
+    let appState = Object.assign({}, DEFAULT_STATE);
+    let mapInstance = null;
+    let basemapGroup = null;
+    let routeGroup = null;
+    let elevationChartInstance = null;
+    let worldCountriesGeo = null;
+
+    function getCssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    async function loadPersistedState() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === `object`) {
+            appState = Object.assign({}, DEFAULT_STATE, saved);
+          }
+        }
+      } catch (err) {
+        // Fallback silently to defaults
+      }
+    }
+
+    function savePersistedState() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+          window.notebookAppApi.setAppState(appState);
+        }
+      } catch (err) {
+        // Ignore persistence errors in non-shim preview
+      }
+    }
+
+    // =========================================================================
+    // TAB NAVIGATION
+    // =========================================================================
+    function switchTab(tabKey) {
+      const tabs = [`map`, `itinerary`, `elevation`, `astro`, `budget`];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const panel = document.getElementById(`panel-${t}`);
+        const active = (t === tabKey);
+        if (btn) btn.setAttribute(`aria-selected`, active ? `true` : `false`);
+        if (panel) panel.classList.toggle(`active`, active);
+      });
+      appState.activeTab = tabKey;
+      savePersistedState();
+
+      if (tabKey === `map` && mapInstance) {
+        setTimeout(() => {
+          mapInstance.invalidateSize();
+        }, 60);
+      }
+      if (tabKey === `elevation` && elevationChartInstance) {
+        elevationChartInstance.resize();
+      }
+    }
+
+    // =========================================================================
+    // INTERACTIVE VECTOR MAP (Leaflet + Natural Earth 50m + Topographic Layers)
+    // =========================================================================
+    function getMapPalette(styleKey) {
+      if (styleKey === `satellite`) {
+        return {
+          bg: getCssVar(`--map-sat-bg`),
+          land: getCssVar(`--map-sat-land`),
+          border: getCssVar(`--map-sat-border`),
+          plateau: getCssVar(`--map-sat-plateau`),
+          ridge: getCssVar(`--map-sat-ridge`),
+          water: getCssVar(`--map-sat-water`),
+          route: getCssVar(`--map-sat-route`),
+          rail: getCssVar(`--map-sat-rail`),
+          textDark: false
+        };
+      }
+      if (styleKey === `street`) {
+        return {
+          bg: getCssVar(`--map-street-bg`),
+          land: getCssVar(`--map-street-land`),
+          border: getCssVar(`--map-street-border`),
+          plateau: getCssVar(`--map-street-plateau`),
+          ridge: getCssVar(`--map-street-ridge`),
+          water: getCssVar(`--map-street-water`),
+          route: getCssVar(`--map-street-route`),
+          rail: getCssVar(`--map-street-rail`),
+          textDark: true
+        };
+      }
+      if (styleKey === `dark`) {
+        return {
+          bg: getCssVar(`--map-dark-bg`),
+          land: getCssVar(`--map-dark-land`),
+          border: getCssVar(`--map-dark-border`),
+          plateau: getCssVar(`--map-dark-plateau`),
+          ridge: getCssVar(`--map-dark-ridge`),
+          water: getCssVar(`--map-dark-water`),
+          route: getCssVar(`--map-dark-route`),
+          rail: getCssVar(`--map-dark-rail`),
+          textDark: false
+        };
+      }
+      return {
+        bg: getCssVar(`--map-topo-bg`),
+        land: getCssVar(`--map-topo-land`),
+        border: getCssVar(`--map-topo-border`),
+        plateau: getCssVar(`--map-topo-plateau`),
+        ridge: getCssVar(`--map-topo-ridge`),
+        water: getCssVar(`--map-topo-water`),
+        route: getCssVar(`--map-topo-route`),
+        rail: getCssVar(`--map-topo-rail`),
+        textDark: true
+      };
+    }
+
+    function initMap() {
+      const container = document.getElementById(`route-map`);
+      if (!container || typeof L === `undefined`) return;
+
+      mapInstance = L.map(`route-map`, {
+        center: [31.5, 95.2],
+        zoom: 5,
+        minZoom: 4,
+        maxZoom: 9,
+        scrollWheelZoom: appState.scrollWheelZoom,
+        touchZoom: true,
+        dragging: true
+      });
+      mapInstance.attributionControl.addAttribution(`Boundaries: Natural Earth (public domain) &bull; Physical Relief Overlay`);
+
+      basemapGroup = L.layerGroup().addTo(mapInstance);
+      routeGroup = L.layerGroup().addTo(mapInstance);
+
+      fetch(`https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json`)
+        .then(r => r.json())
+        .then(topo => {
+          worldCountriesGeo = topojson.feature(topo, topo.objects.countries);
+          renderBasemapLayers();
+          renderRouteLayers();
+          updateInspector(appState.selectedDay === `all` ? 5 : appState.selectedDay);
+        })
+        .catch(() => {
+          renderBasemapLayers();
+          renderRouteLayers();
+          updateInspector(5);
+        });
+    }
+
+    function renderBasemapLayers() {
+      if (!mapInstance || !basemapGroup) return;
+      basemapGroup.clearLayers();
+      const pal = getMapPalette(appState.mapStyle);
+      const mapEl = document.getElementById(`route-map`);
+      if (mapEl) mapEl.style.backgroundColor = pal.bg;
+
+      if (worldCountriesGeo) {
+        L.geoJSON(worldCountriesGeo, {
+          style: feature => {
+            const isFocus = feature.properties && (feature.properties.name === `China`);
+            return {
+              fillColor: pal.land,
+              fillOpacity: isFocus ? 1 : 0.72,
+              color: pal.border,
+              weight: isFocus ? 1.1 : 0.7
+            };
+          }
+        }).addTo(basemapGroup);
+      }
+
+      // Tibetan Plateau 4,000m+ elevation contour zone & 4,500m inner crest
+      const plateauOuter = [
+        [36.5, 79.0], [37.4, 88.0], [36.8, 96.5], [34.2, 101.8],
+        [30.5, 101.5], [28.6, 97.5], [27.9, 91.5], [28.1, 86.5],
+        [29.8, 82.0], [33.5, 78.8]
+      ];
+      L.polygon(plateauOuter, {
+        fillColor: pal.plateau,
+        fillOpacity: 0.55,
+        color: pal.ridge,
+        weight: 0.9,
+        dashArray: `3 4`,
+        interactive: false
+      }).addTo(basemapGroup);
+
+      // Himalayan crest contour line + Yarlung Tsangpo River line
+      const himalayanCrest = [
+        [28.5, 84.5], [28.0, 86.9], [27.8, 88.9], [27.9, 91.8], [29.6, 95.0]
+      ];
+      L.polyline(himalayanCrest, {
+        color: pal.ridge,
+        weight: 2,
+        opacity: 0.85,
+        dashArray: `2 5`,
+        interactive: false
+      }).addTo(basemapGroup);
+
+      const yarlungRiver = [
+        [29.35, 86.2], [29.28, 88.88], [29.32, 90.8], [29.25, 92.8], [29.62, 94.9]
+      ];
+      L.polyline(yarlungRiver, {
+        color: pal.water,
+        weight: 2,
+        opacity: 0.8,
+        interactive: false
+      }).addTo(basemapGroup);
+
+      // Graticule subtle meridians / parallels
+      [28, 32, 36].forEach(lat => {
+        L.polyline([[lat, 78], [lat, 108]], {
+          color: pal.border,
+          weight: 0.45,
+          opacity: 0.45,
+          interactive: false
+        }).addTo(basemapGroup);
+      });
+      [85, 90, 95, 100, 105].forEach(lng => {
+        L.polyline([[26, lng], [39, lng]], {
+          color: pal.border,
+          weight: 0.45,
+          opacity: 0.45,
+          interactive: false
+        }).addTo(basemapGroup);
+      });
+
+      // Dark Stargazing star points on the plateau
+      if (appState.mapStyle === `dark`) {
+        const starPoints = [
+          [33.8, 84.2], [35.4, 88.5], [31.9, 83.1], [34.1, 98.2],
+          [27.2, 85.4], [37.1, 93.4], [30.8, 80.5], [36.2, 104.5]
+        ];
+        starPoints.forEach(pt => {
+          L.circleMarker(pt, {
+            radius: 2,
+            color: getCssVar(`--map-star-gold`),
+            fillColor: getCssVar(`--map-star-gold`),
+            fillOpacity: 0.85,
+            weight: 0,
+            interactive: false
+          }).addTo(basemapGroup);
+        });
+      }
+    }
+
+    function renderRouteLayers() {
+      if (!mapInstance || !routeGroup) return;
+      routeGroup.clearLayers();
+      const pal = getMapPalette(appState.mapStyle);
+
+      // Flight corridors (dashed gray, distance excluded)
+      L.polyline([[30.5728, 104.0668], [29.6491, 94.3615]], {
+        color: pal.ridge,
+        weight: 1.8,
+        dashArray: `5 6`,
+        opacity: 0.75
+      }).bindTooltip(`Flight: Chengdu → Nyingchi (Distance Excluded)`).addTo(routeGroup);
+
+      L.polyline([[36.6171, 101.7782], [30.5728, 104.0668]], {
+        color: pal.ridge,
+        weight: 1.8,
+        dashArray: `5 6`,
+        opacity: 0.75
+      }).bindTooltip(`Flight: Xining → Chengdu (Distance Excluded)`).addTo(routeGroup);
+
+      // Overland coach route (D2–D8)
+      const overlandCoords = [
+        [29.6491, 94.3615], // Nyingchi
+        [29.6186, 94.6486], // Sejila
+        [30.0047, 93.9278], // Basum Tso
+        [29.6525, 91.1721], // Lhasa
+        [29.0764, 90.6922], // Yamdrok
+        [28.9061, 90.1819], // Karola
+        [29.2669, 88.8806], // Shigatse
+        [28.9006, 88.0211], // Sakya
+        [28.3489, 86.7847], // Gawula
+        [28.1967, 86.8292], // EBC
+        [28.8856, 87.4567], // Gyatso La
+        [29.2669, 88.8806], // Shigatse
+        [29.6525, 91.1721]  // Lhasa
+      ];
+      L.polyline(overlandCoords, {
+        color: pal.route,
+        weight: 3,
+        opacity: 0.92
+      }).addTo(routeGroup);
+
+      // Qingzang Railway route (D9–D10)
+      const railCoords = [
+        [29.6525, 91.1721],
+        [31.4762, 92.0512], // Nagqu
+        [32.8753, 91.9161], // Tanggula Pass
+        [35.2167, 93.0667], // Hoh Xil
+        [36.4024, 94.9032], // Golmud
+        [36.6171, 101.7782] // Xining
+      ];
+      L.polyline(railCoords, {
+        color: pal.rail,
+        weight: 3.2,
+        dashArray: `8 4`,
+        opacity: 0.95
+      }).bindTooltip(`Qingzang Railway Soft Sleeper (1,956 km)`).addTo(routeGroup);
+
+      // Day markers D1–D10
+      EXPEDITION_DAYS.forEach(d => {
+        const isSelected = (appState.selectedDay === d.day);
+        const dimmed = (appState.selectedDay !== `all` && !isSelected);
+        const marker = L.circleMarker(d.coords, {
+          radius: isSelected ? 10 : 7,
+          color: pal.textDark ? pal.route : pal.rail,
+          fillColor: isSelected ? pal.rail : pal.land,
+          fillOpacity: dimmed ? 0.35 : 1,
+          opacity: dimmed ? 0.4 : 1,
+          weight: isSelected ? 3 : 2
+        });
+
+        const popupHtml = `
+          <div style="min-width:210px;display:grid;gap:4px;">
+            <strong style="font-size:14px;">D${d.day}: ${d.city}</strong>
+            <span style="font-size:11px;color:var(--secondary);">${d.country} &rsaquo; ${d.province}</span>
+            <span style="font-size:12px;">Altitude: <strong>${d.altitude} m</strong> &bull; Surface: <strong>${d.distanceKm} km</strong></span>
+            <span style="font-size:12px;">${d.title}</span>
+          </div>
+        `;
+        marker.bindPopup(popupHtml);
+        marker.on(`click`, () => {
+          selectMapDay(d.day, false);
+        });
+        marker.addTo(routeGroup);
+      });
+    }
+
+    function setMapStyle(styleKey) {
+      appState.mapStyle = styleKey;
+      [`topo`, `satellite`, `street`, `dark`].forEach(k => {
+        const btn = document.getElementById(`style-btn-${k}`);
+        if (btn) btn.classList.toggle(`active-chip`, k === styleKey);
+      });
+      renderBasemapLayers();
+      renderRouteLayers();
+      savePersistedState();
+    }
+
+    function selectMapDay(dayVal, panToDay = true) {
+      appState.selectedDay = dayVal;
+      const allBtn = document.getElementById(`day-filter-all`);
+      if (allBtn) allBtn.setAttribute(`aria-pressed`, dayVal === `all` ? `true` : `false`);
+      for (let i = 1; i <= 10; i++) {
+        const btn = document.getElementById(`day-filter-${i}`);
+        if (btn) btn.setAttribute(`aria-pressed`, dayVal === i ? `true` : `false`);
+      }
+
+      renderRouteLayers();
+      const targetDay = dayVal === `all` ? 5 : dayVal;
+      updateInspector(targetDay);
+
+      if (mapInstance && panToDay) {
+        if (dayVal === `all`) {
+          fitFullRoute();
+        } else {
+          const dObj = EXPEDITION_DAYS.find(x => x.day === dayVal);
+          if (dObj) {
+            mapInstance.panTo(dObj.coords, { animate: true });
+          }
+        }
+      }
+      savePersistedState();
+    }
+
+    function fitFullRoute() {
+      if (!mapInstance) return;
+      mapInstance.setView([31.5, 95.2], 5, { animate: true });
+    }
+
+    function toggleScrollWheelZoom() {
+      if (!mapInstance) return;
+      appState.scrollWheelZoom = !appState.scrollWheelZoom;
+      if (appState.scrollWheelZoom) {
+        mapInstance.scrollWheelZoom.enable();
+      } else {
+        mapInstance.scrollWheelZoom.disable();
+      }
+      const lbl = document.getElementById(`wheel-label`);
+      if (lbl) lbl.textContent = appState.scrollWheelZoom ? `Scroll Zoom: On` : `Scroll Zoom: Off`;
+      savePersistedState();
+    }
+
+    function copyGoogleMapsQuery(label, lat, lng, feedbackId) {
+      const queryText = `${label} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(queryText).catch(() => {});
+      }
+      const fb = document.getElementById(feedbackId);
+      if (fb) {
+        fb.textContent = `Copied Google Maps search query: ${queryText}`;
+      }
+    }
+
+    function updateInspector(dayNum) {
+      const container = document.getElementById(`stop-inspector-content`);
+      if (!container) return;
+      const d = EXPEDITION_DAYS.find(x => x.day === dayNum) || EXPEDITION_DAYS[0];
+
+      const stopsHtml = d.stops.map((st, idx) => {
+        const fbId = `map-copy-fb-${d.day}-${idx}`;
+        return `
+          <div class="stop-row">
+            <div>
+              <div style="font-weight:600;font-size:0.9375rem;">${st.name}</div>
+              <div class="mono-readout">${st.admin} &bull; ${st.alt} m &bull; ${st.lat.toFixed(4)}, ${st.lng.toFixed(4)}</div>
+              <div class="feedback-inline" id="${fbId}"></div>
+            </div>
+            <button type="button" class="btn btn-sm" onclick="copyGoogleMapsQuery('${st.name.replace(/'/g, `\\'`)}, ${st.admin}', ${st.lat}, ${st.lng}, '${fbId}')">
+              Copy Google Maps Query
+            </button>
+          </div>
+        `;
+      }).join(``);
+
+      container.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-sm);">
+          <span class="day-badge">Day ${d.day} &bull; ${d.date}</span>
+          <span class="mono-readout">${d.travelMode}</span>
+        </div>
+        <h3 class="subhead">${d.title}</h3>
+        <div class="admin-breadcrumb">${d.country} &rsaquo; ${d.province} &rsaquo; ${d.city}</div>
+        <p style="margin:0;color:var(--on-surface-variant);">${d.highlights}</p>
+
+        <div class="meta-grid">
+          <div class="meta-box">
+            <div class="label">Sleeping altitude</div>
+            <div class="kpi-value" style="font-size:1.15rem;">${d.altitude} m</div>
+            ${d.passAltitude ? `<div class="kpi-note">Pass crossing: ${d.passAltitude} m</div>` : `<div class="kpi-note">Whole-meter elevation</div>`}
+          </div>
+          <div class="meta-box">
+            <div class="label">Surface / rail distance</div>
+            <div class="kpi-value" style="font-size:1.15rem;">${d.distanceKm} km</div>
+            <div class="kpi-note">Flights excluded from total</div>
+          </div>
+        </div>
+
+        <div class="meta-box">
+          <div class="label">Meals &amp; accommodation</div>
+          <div style="font-size:0.875rem;margin-top:4px;"><strong>Meals:</strong> ${d.meals}</div>
+          <div style="font-size:0.875rem;margin-top:2px;"><strong>Stay:</strong> ${d.hotel}</div>
+        </div>
+
+        <div>
+          <div class="label" style="margin-bottom:var(--space-xs);">Stops &amp; Google Maps GPS coordinates</div>
+          <div class="stops-sublist">${stopsHtml}</div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // DAILY ITINERARY CARDS
+    // =========================================================================
+    function renderItineraryCards() {
+      const container = document.getElementById(`itinerary-cards-container`);
+      if (!container) return;
+
+      container.innerHTML = EXPEDITION_DAYS.map((d, idx) => {
+        const isFirstOpen = (idx < 2);
+        const stopsMarkup = d.stops.map((st, sIdx) => {
+          const fbId = `itin-fb-${d.day}-${sIdx}`;
+          return `
+            <div class="stop-row">
+              <div>
+                <strong>${st.name}</strong>
+                <div class="mono-readout">${st.admin} &bull; ${st.alt} m &bull; GPS ${st.lat.toFixed(4)}, ${st.lng.toFixed(4)}</div>
+                <div class="feedback-inline" id="${fbId}"></div>
+              </div>
+              <button type="button" class="btn btn-sm" onclick="copyGoogleMapsQuery('${st.name.replace(/'/g, `\\'`)}, ${st.admin}', ${st.lat}, ${st.lng}, '${fbId}')">
+                Open in Google Maps (Copy GPS)
+              </button>
+            </div>
+          `;
+        }).join(``);
+
+        return `
+          <article class="day-card">
+            <button type="button" class="day-card-header" aria-expanded="${isFirstOpen ? `true` : `false`}" aria-controls="day-body-${d.day}" onclick="toggleDayCard(${d.day}, this)">
+              <div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;">
+                <span class="day-badge">D${d.day} &bull; ${d.date}</span>
+                <strong style="font-family:var(--font-headline);font-size:1.0625rem;">${d.title}</strong>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--space-md);">
+                <span class="mono-readout">${d.altitude} m &bull; ${d.distanceKm} km</span>
+                <span class="label" style="color:var(--primary);">${isFirstOpen ? `Hide` : `Details`}</span>
+              </div>
+            </button>
+            <div class="day-card-body" id="day-body-${d.day}" ${isFirstOpen ? `` : `hidden`}>
+              <div class="admin-breadcrumb">${d.country} &rsaquo; ${d.province} &rsaquo; ${d.city}</div>
+              <p style="margin:0;"><strong>Route:</strong> ${d.route}</p>
+              <p style="margin:0;color:var(--on-surface-variant);">${d.highlights}</p>
+              <div class="day-specs">
+                <div class="meta-box">
+                  <div class="label">Elevation</div>
+                  <div><strong>${d.altitude} m</strong> sleeping${d.passAltitude ? ` (Pass ${d.passAltitude} m)` : ``}</div>
+                </div>
+                <div class="meta-box">
+                  <div class="label">Surface / rail distance</div>
+                  <div><strong>${d.distanceKm} km</strong> (${d.travelMode})</div>
+                </div>
+                <div class="meta-box">
+                  <div class="label">Meals coverage</div>
+                  <div>${d.meals}</div>
+                </div>
+                <div class="meta-box">
+                  <div class="label">Accommodation</div>
+                  <div>${d.hotel}</div>
+                </div>
+              </div>
+              <div class="stops-sublist">${stopsMarkup}</div>
+            </div>
+          </article>
+        `;
+      }).join(``);
+    }
+
+    function toggleDayCard(dayNum, btnEl) {
+      const body = document.getElementById(`day-body-${dayNum}`);
+      if (!body || !btnEl) return;
+      const expanded = btnEl.getAttribute(`aria-expanded`) === `true`;
+      btnEl.setAttribute(`aria-expanded`, expanded ? `false` : `true`);
+      body.hidden = expanded;
+      const labelSpan = btnEl.querySelector(`.label`);
+      if (labelSpan) labelSpan.textContent = expanded ? `Details` : `Hide`;
+    }
+
+    function toggleAllDays(expand) {
+      EXPEDITION_DAYS.forEach(d => {
+        const body = document.getElementById(`day-body-${d.day}`);
+        const header = document.querySelector(`[aria-controls="day-body-${d.day}"]`);
+        if (body) body.hidden = !expand;
+        if (header) {
+          header.setAttribute(`aria-expanded`, expand ? `true` : `false`);
+          const labelSpan = header.querySelector(`.label`);
+          if (labelSpan) labelSpan.textContent = expand ? `Hide` : `Details`;
+        }
+      });
+    }
+
+    // =========================================================================
+    // ELEVATION CHART & TABLE
+    // =========================================================================
+    function renderElevationSection() {
+      const tbody = document.getElementById(`elevation-table-body`);
+      if (tbody) {
+        tbody.innerHTML = ELEVATION_POINTS.map(pt => `
+          <tr>
+            <td><strong>${pt.label}</strong></td>
+            <td class="mono-readout">${pt.admin}</td>
+            <td class="mono-readout">${pt.day}</td>
+            <td class="num-col"><strong>${pt.alt} m</strong></td>
+            <td>${pt.band}</td>
+          </tr>
+        `).join(``);
+      }
+
+      const canvas = document.getElementById(`elevationChart`);
+      if (!canvas || typeof Chart === `undefined`) return;
+
+      const primaryColor = getCssVar(`--data-1`);
+      const fillColor = getCssVar(`--primary-container`);
+      const gridColor = getCssVar(`--outline-variant`);
+      const textColor = getCssVar(`--on-surface-variant`);
+
+      elevationChartInstance = new Chart(canvas.getContext(`2d`), {
+        type: `line`,
+        data: {
+          labels: ELEVATION_POINTS.map(p => `${p.label} (${p.day})`),
+          datasets: [{
+            label: `Altitude (m)`,
+            data: ELEVATION_POINTS.map(p => p.alt),
+            borderColor: primaryColor,
+            backgroundColor: fillColor,
+            fill: true,
+            tension: 0.28,
+            borderWidth: 2.5,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: getCssVar(`--data-2`),
+            pointBorderColor: getCssVar(`--surface-container-low`),
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => `Elevation: ${Math.round(ctx.parsed.y)} m`
+              }
+            }
+          },
+          scales: {
+            y: {
+              min: 0,
+              max: 5600,
+              ticks: {
+                stepSize: 1000,
+                color: textColor,
+                callback: v => `${Math.round(v)} m`
+              },
+              grid: { color: gridColor }
+            },
+            x: {
+              ticks: { color: textColor },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // ASTROPHOTOGRAPHY CALCULATOR & CHECKLIST
+    // =========================================================================
+    function syncFocalFromSlider(val) {
+      const numEl = document.getElementById(`astro-focal`);
+      if (numEl) numEl.value = val;
+      updateAstroCalc();
+    }
+
+    function syncFocalFromNumber(val) {
+      const sliderEl = document.getElementById(`astro-focal-slider`);
+      if (sliderEl) sliderEl.value = val;
+      updateAstroCalc();
+    }
+
+    function updateAstroCalc() {
+      const focalEl = document.getElementById(`astro-focal`);
+      const sensorEl = document.getElementById(`astro-sensor`);
+      const outEl = document.getElementById(`astro-shutter-out`);
+      const adviceEl = document.getElementById(`astro-advice-out`);
+      if (!focalEl || !sensorEl || !outEl || !adviceEl) return;
+
+      const focal = Math.max(10, Math.min(85, Number(focalEl.value) || 18));
+      const crop = Number(sensorEl.value) || 1;
+      const effectiveFocal = focal * crop;
+      const maxSec = Math.round(500 / effectiveFocal);
+
+      appState.focalLength = focal;
+      appState.sensorCrop = crop;
+      savePersistedState();
+
+      outEl.textContent = `${maxSec} s max (Target 15–20 s)`;
+      if (maxSec >= 18) {
+        adviceEl.textContent = `Great wide field (${Math.round(effectiveFocal)} mm eq.) — 15–20 s keeps stars sharp at ISO 3200–6400.`;
+      } else if (maxSec >= 12) {
+        adviceEl.textContent = `Tighter field (${Math.round(effectiveFocal)} mm eq.) — clamp shutter to ${maxSec} s to prevent trailing.`;
+      } else {
+        adviceEl.textContent = `Narrow focal (${Math.round(effectiveFocal)} mm eq.) — keep shutter <= ${maxSec} s and raise ISO to 6400.`;
+      }
+    }
+
+    function renderAstroChecklist() {
+      const container = document.getElementById(`astro-checklist`);
+      if (!container) return;
+      container.innerHTML = ASTRO_CHECKLIST_ITEMS.map(item => {
+        const checked = !!appState.astroChecklist[item.id];
+        return `
+          <label class="check-row">
+            <input type="checkbox" ${checked ? `checked` : ``} onchange="toggleAstroItem('${item.id}', this.checked)">
+            <span>${item.label}</span>
+          </label>
+        `;
+      }).join(``);
+      updateAstroProgress();
+    }
+
+    function toggleAstroItem(id, isChecked) {
+      appState.astroChecklist[id] = isChecked;
+      updateAstroProgress();
+      savePersistedState();
+    }
+
+    function updateAstroProgress() {
+      const el = document.getElementById(`astro-check-progress`);
+      if (!el) return;
+      const done = ASTRO_CHECKLIST_ITEMS.filter(i => appState.astroChecklist[i.id]).length;
+      el.textContent = `${done} / ${ASTRO_CHECKLIST_ITEMS.length} packed`;
+    }
+
+    // =========================================================================
+    // BUDGET CALCULATOR & PAYMENT MILESTONE TRACKER
+    // =========================================================================
+    function syncExtrasFromSlider(val) {
+      const numEl = document.getElementById(`budget-extras-num`);
+      if (numEl) numEl.value = val;
+      recalcBudget();
+    }
+
+    function syncExtrasFromNumber(val) {
+      const sliderEl = document.getElementById(`budget-extras-slider`);
+      if (sliderEl) sliderEl.value = Math.min(600, Math.max(0, Number(val) || 0));
+      recalcBudget();
+    }
+
+    function recalcBudget() {
+      const roomEl = document.getElementById(`budget-room-type`);
+      const fxEl = document.getElementById(`budget-fx`);
+      const extrasEl = document.getElementById(`budget-extras-num`);
+      const tbody = document.getElementById(`budget-breakdown-body`);
+      if (!roomEl || !fxEl || !extrasEl || !tbody) return;
+
+      const basePackageRmb = 9000;
+      const roomSuppRmb = Number(roomEl.value) || 0;
+      const fx = Math.max(3.5, Number(fxEl.value) || 5.35);
+      const selfPaidMealsRmb = 16 * 30; // 480 RMB
+      const extrasRmb = Math.max(0, Number(extrasEl.value) || 0);
+      const ebcUpgradeRmb = 0;
+      const airfareSgd = 400;
+      const airfareRmbEq = Math.round(airfareSgd * fx);
+
+      appState.roomSupplement = roomSuppRmb;
+      appState.fxRate = fx;
+      appState.extrasRmb = extrasRmb;
+      savePersistedState();
+
+      const totalRmb = basePackageRmb + roomSuppRmb + selfPaidMealsRmb + extrasRmb + ebcUpgradeRmb + airfareRmbEq;
+      const totalSgd = Math.round(totalRmb / fx);
+
+      const rows = [
+        { name: `Base Tour Package (Twin Sharing)`, note: `10D9N private tour, permits, hotels, rail & domestic flights`, rmb: basePackageRmb, sgd: Math.round(basePackageRmb / fx) },
+        { name: `Single Room Supplement`, note: roomSuppRmb > 0 ? `Private single room throughout` : `Twin-sharing selected`, rmb: roomSuppRmb, sgd: Math.round(roomSuppRmb / fx) },
+        { name: `EBC / Rongbuk Stay Upgrade`, note: `Fully included in package`, rmb: 0, sgd: 0 },
+        { name: `16 Self-Paid Lunches & Dinners`, note: `16 meals × 30 RMB baseline (excludes 8 breakfasts + 2 gifted meals + afternoon tea)`, rmb: selfPaidMealsRmb, sgd: Math.round(selfPaidMealsRmb / fx) },
+        { name: `Optional Drinks & Add-On Dishes`, note: `Adjustable personal allowance`, rmb: extrasRmb, sgd: Math.round(extrasRmb / fx) },
+        { name: `International Airfare to/from Chengdu`, note: `Fixed SGD 400 budget`, rmb: airfareRmbEq, sgd: airfareSgd }
+      ];
+
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td><strong>${r.name}</strong></td>
+          <td style="color:var(--on-surface-variant);">${r.note}</td>
+          <td class="num-col">${r.rmb.toLocaleString()} RMB</td>
+          <td class="num-col">${r.sgd.toLocaleString()} SGD</td>
+        </tr>
+      `).join(``) + `
+        <tr style="background:var(--surface-container);">
+          <td><strong>Estimated All-In Trip Total</strong></td>
+          <td><strong>Includes package, meals, extras &amp; SGD 400 airfare</strong></td>
+          <td class="num-col"><strong>${totalRmb.toLocaleString()} RMB</strong></td>
+          <td class="num-col"><strong>${totalSgd.toLocaleString()} SGD</strong></td>
+        </tr>
+      `;
+    }
+
+    function renderPaymentMilestones() {
+      const container = document.getElementById(`payment-milestones`);
+      if (!container) return;
+      container.innerHTML = PAYMENT_MILESTONES_DATA.map(m => {
+        const checked = !!appState.paymentChecklist[m.id];
+        return `
+          <label class="check-row">
+            <input type="checkbox" ${checked ? `checked` : ``} onchange="togglePaymentMilestone('${m.id}', this.checked)">
+            <span><strong>${m.title}</strong><br><span style="color:var(--on-surface-variant);font-size:0.875rem;">${m.detail}</span></span>
+          </label>
+        `;
+      }).join(``);
+      updatePaymentProgress();
+    }
+
+    function togglePaymentMilestone(id, isChecked) {
+      appState.paymentChecklist[id] = isChecked;
+      updatePaymentProgress();
+      savePersistedState();
+    }
+
+    function updatePaymentProgress() {
+      const el = document.getElementById(`payment-progress-label`);
+      if (!el) return;
+      const done = PAYMENT_MILESTONES_DATA.filter(m => appState.paymentChecklist[m.id]).length;
+      el.textContent = `${done} / ${PAYMENT_MILESTONES_DATA.length} settled`;
+    }
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+    async function bootstrapDashboard() {
+      await loadPersistedState();
+
+      // Hydrate form inputs from state
+      const roomEl = document.getElementById(`budget-room-type`);
+      const fxEl = document.getElementById(`budget-fx`);
+      const extrasSlider = document.getElementById(`budget-extras-slider`);
+      const extrasNum = document.getElementById(`budget-extras-num`);
+      const focalSlider = document.getElementById(`astro-focal-slider`);
+      const focalNum = document.getElementById(`astro-focal`);
+      const sensorEl = document.getElementById(`astro-sensor`);
+      const wheelLbl = document.getElementById(`wheel-label`);
+
+      if (roomEl) roomEl.value = String(appState.roomSupplement || 0);
+      if (fxEl) fxEl.value = String(appState.fxRate || 5.35);
+      if (extrasSlider) extrasSlider.value = String(Math.min(600, appState.extrasRmb || 160));
+      if (extrasNum) extrasNum.value = String(appState.extrasRmb || 160);
+      if (focalSlider) focalSlider.value = String(appState.focalLength || 18);
+      if (focalNum) focalNum.value = String(appState.focalLength || 18);
+      if (sensorEl) sensorEl.value = String(appState.sensorCrop || 1);
+      if (wheelLbl) wheelLbl.textContent = appState.scrollWheelZoom ? `Scroll Zoom: On` : `Scroll Zoom: Off`;
+
+      if (typeof lucide !== `undefined`) {
+        lucide.createIcons();
+      }
+
+      renderItineraryCards();
+      renderElevationSection();
+      renderAstroChecklist();
+      updateAstroCalc();
+      renderPaymentMilestones();
+      recalcBudget();
+      initMap();
+
+      // Restore active map style & day filter buttons
+      [`topo`, `satellite`, `street`, `dark`].forEach(k => {
+        const btn = document.getElementById(`style-btn-${k}`);
+        if (btn) btn.classList.toggle(`active-chip`, k === appState.mapStyle);
+      });
+      const allBtn = document.getElementById(`day-filter-all`);
+      if (allBtn) allBtn.setAttribute(`aria-pressed`, appState.selectedDay === `all` ? `true` : `false`);
+      for (let i = 1; i <= 10; i++) {
+        const dBtn = document.getElementById(`day-filter-${i}`);
+        if (dBtn) dBtn.setAttribute(`aria-pressed`, appState.selectedDay === i ? `true` : `false`);
+      }
+      switchTab(appState.activeTab || `map`);
+    }
+
+    document.addEventListener(`DOMContentLoaded`, bootstrapDashboard);
+  </script>
+</body>
+</html>
