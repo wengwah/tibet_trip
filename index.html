@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="artifact-type" content="dashboard">
-  <meta name="design-style" content="nocturne">
-  <title>Tibet 2027 Expedition — Route Map, Telemetry &amp; EBC Astro Planner</title>
+  <meta name="design-style" content="aurora">
+  <title>2027 Tibet Spring Expedition — Route Map &amp; Travel Dashboard</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
@@ -20,74 +21,94 @@
     :root {
       color-scheme: dark;
 
-      /* Nocturne + Midnight Slate Dark Palette (#0F172A requested base) */
-      --background: #0F172A;
-      --surface-container-low: #131D34;
-      --surface-container: #17233D;
-      --surface-container-high: #1E2E4F;
-      --glass-surface: rgba(23, 35, 61, 0.78);
-      --glass-elevated: rgba(30, 46, 79, 0.85);
+      /* 1. Aurora dark-mode tokens adapted to #0F172A deep midnight + slate & emerald */
+      --background: #0f172a;
+      --surface-container-low: #131d33;
+      --surface-container: #18233c;
+      --surface-container-high: #1f2e4d;
 
-      /* Text */
-      --on-surface: #F2ECE1;
-      --on-surface-variant: #A6B4CC;
+      --on-surface: #f1f5f9;
+      --on-surface-variant: #94a3b8;
 
-      /* Borders */
-      --outline: #3B527A;
-      --outline-variant: #253659;
+      --outline: #475569;
+      --outline-variant: #27354f;
 
-      /* Accents: Celestial Gold & Emerald Neon */
-      --primary: #E5B25D;
-      --on-primary: #0B1120;
-      --primary-container: #2B2418;
-      --on-primary-container: #FBE4B8;
-      --secondary: #687A99;
-      --tertiary: #34D399;
-      --tertiary-dim: #10B981;
-      --sky: #7CC4E8;
-      --error: #F27474;
-      --on-error: #1A0606;
-
-      /* Semantic */
-      --positive: #34D399;
-      --warning: #F59E0B;
-      --focus: #E5B25D;
+      --primary: #34d399;
+      --on-primary: #06281e;
+      --primary-container: #0f3a36;
+      --on-primary-container: #a7f3d0;
+      --secondary: #64748b;
+      --tertiary: #38bdf8;
+      --error: #f87171;
+      --on-error: #2b0909;
 
       /* Data series */
-      --data-1: #E5B25D;
-      --data-2: #34D399;
-      --data-3: #7CC4E8;
-      --data-4: #E07A5F;
-      --data-context: #4A5D80;
+      --data-1: #34d399;
+      --data-2: #38bdf8;
+      --data-3: #fbbf24;
+      --data-4: #fb7185;
+      --data-context: #475569;
 
-      /* Map Style Tokens */
-      --map-sat-ocean: #091322;
-      --map-sat-land: #1B2823;
-      --map-sat-plateau: #27322C;
-      --map-sat-peak: #3D4A48;
-      --map-topo-ocean: #0D1B2A;
-      --map-topo-land: #1D2A24;
-      --map-street-ocean: #122033;
-      --map-street-land: #1F2937;
-      --map-astro-ocean: #050914;
-      --map-astro-land: #0B1120;
+      /* Map palette tokens */
+      --map-ocean-sat: #091220;
+      --map-land-sat: #132236;
+      --map-plateau-sat: #192d44;
+      --map-ridge-sat: #223b57;
+      --map-border-sat: #334e70;
+
+      --map-ocean-topo: #0d1926;
+      --map-land-topo: #1a2936;
+      --map-plateau-topo: #243842;
+      --map-ridge-topo: #2e4852;
+      --map-border-topo: #4d6a78;
+
+      --map-ocean-atlas: #111c2d;
+      --map-land-atlas: #1d2a3d;
+      --map-plateau-atlas: #233349;
+      --map-ridge-atlas: #2b3f59;
+      --map-border-atlas: #64748b;
+
+      --map-ocean-astro: #04070f;
+      --map-land-astro: #09101f;
+      --map-plateau-astro: #0d1629;
+      --map-ridge-astro: #121f38;
+      --map-border-astro: #1e3154;
 
       /* Fonts */
-      --font-headline: 'EB Garamond', Georgia, serif;
-      --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --font-label: 'JetBrains Mono', monospace;
-
-      /* Type scale (Dashboard) */
-      --display-size: clamp(1.75rem, 1.35rem + 1.4vw, 2.35rem);
-      --headline-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.55rem);
-      --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
-      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
-      --label-size: 0.75rem;
+      --font-headline: 'Instrument Sans', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-label: 'Geist Mono', monospace;
 
       /* Shape */
-      --rounded: 0.375rem;
-      --rounded-lg: 0.75rem;
+      --rounded: 0.5rem;
+      --rounded-lg: 0.875rem;
       --rounded-full: 9999px;
+
+      /* Style effects */
+      --hairline: 1px solid var(--outline-variant);
+      --hairline-strong: 1px solid var(--outline);
+      --panel-gradient: linear-gradient(180deg, rgba(30, 41, 59, 0.78) 0%, rgba(15, 23, 42, 0.88) 100%);
+      --glass-bg: rgba(24, 35, 60, 0.72);
+      --glass-border: 1px solid rgba(148, 163, 184, 0.16);
+      --heading-tracking: -0.025em;
+      --label-tracking: 0.06em;
+      --emerald-tint: color-mix(in srgb, var(--primary) 14%, transparent);
+      --sky-tint: color-mix(in srgb, var(--tertiary) 14%, transparent);
+      --amber-tint: color-mix(in srgb, var(--data-3) 14%, transparent);
+      --rose-tint: color-mix(in srgb, var(--error) 14%, transparent);
+      --glow-emerald: 0 0 24px rgba(52, 211, 153, 0.12);
+
+      /* 3. Shared tokens */
+      --positive: #34d399;
+      --warning: #fbbf24;
+      --focus: #34d399;
+
+      /* Type scale (Dashboard tight ratio) */
+      --display-size: clamp(1.5rem, 1.25rem + 1.1vw, 2.15rem);
+      --headline-size: clamp(1.1875rem, 1.05rem + 0.45vw, 1.45rem);
+      --subhead-size: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.12vw, 1rem);
+      --label-size: 0.75rem;
 
       /* Spacing scale (4pt base) */
       --space-xs: 0.25rem;
@@ -103,36 +124,21 @@
       --dur-micro: 120ms;
       --dur-short: 220ms;
       --dur-long: 420ms;
-
-      /* Style effects */
-      --hairline: 1px solid var(--outline-variant);
-      --hairline-strong: 1px solid var(--outline);
-      --panel-highlight: inset 0 1px 0 rgba(242, 236, 225, 0.08);
-      --brass-glow: radial-gradient(circle at 86% 10%, rgba(229, 178, 93, 0.14), transparent 46%),
-                    radial-gradient(circle at 12% 24%, rgba(52, 211, 153, 0.09), transparent 42%);
-      --gold-tint: color-mix(in srgb, var(--primary) 14%, transparent);
-      --emerald-tint: color-mix(in srgb, var(--tertiary) 14%, transparent);
-      --sky-tint: color-mix(in srgb, var(--sky) 14%, transparent);
-      --warning-tint: color-mix(in srgb, var(--warning) 15%, transparent);
-      --error-tint: color-mix(in srgb, var(--error) 15%, transparent);
-      --heading-tracking: -0.015em;
-      --label-tracking: 0.06em;
     }
 
+    /* Base reset */
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       overflow-x: clip;
       margin: 0;
       padding: 0;
       background-color: var(--background);
-      background-image: var(--brass-glow);
       color: var(--on-surface);
       font-family: var(--font-body);
       font-size: var(--body-size);
-      line-height: 1.55;
+      line-height: 1.5;
       -webkit-font-smoothing: antialiased;
     }
-
     header { position: static !important; }
 
     button, input, select, textarea {
@@ -145,24 +151,25 @@
       outline-offset: 2px;
     }
 
-    .app-shell {
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: var(--space-lg);
+    .page-grid {
       display: grid;
       gap: var(--space-lg);
+      padding: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow: hidden;
     }
-    .app-shell * { min-width: 0; }
+    .page-grid * { min-width: 0; }
 
     /* Hero Header */
-    .hero-header {
-      background: var(--glass-surface);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: var(--hairline);
-      box-shadow: var(--panel-highlight);
+    .hero-panel {
+      background: var(--panel-gradient);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: var(--glass-border);
       border-radius: var(--rounded-lg);
       padding: var(--space-lg);
+      box-shadow: var(--glow-emerald);
       display: grid;
       gap: var(--space-md);
     }
@@ -175,73 +182,81 @@
       gap: var(--space-md);
     }
 
-    .title-block h1 {
-      font-family: var(--font-headline);
-      font-weight: 500;
-      font-size: var(--display-size);
-      letter-spacing: var(--heading-tracking);
-      line-height: 1.08;
-      margin: 0;
-      color: var(--on-surface);
-    }
-    .title-block h1 em {
-      color: var(--primary);
-      font-style: italic;
-      font-weight: 400;
-    }
-
-    .deck-line {
+    .hero-kicker {
       font-family: var(--font-label);
       font-size: var(--label-size);
       letter-spacing: var(--label-tracking);
       text-transform: uppercase;
       color: var(--primary);
-      margin-top: var(--space-xs);
+      margin: 0 0 var(--space-xs) 0;
     }
 
-    .hero-lede {
-      color: var(--on-surface-variant);
-      font-size: var(--body-size);
-      max-width: 68ch;
+    .hero-title {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 600;
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.12;
+      margin: 0;
+      color: var(--on-surface);
+    }
+
+    .hero-subtitle {
       margin: var(--space-xs) 0 0 0;
+      color: var(--on-surface-variant);
+      max-width: 65ch;
+      font-size: var(--body-size);
     }
 
-    .hero-badges {
+    .hero-meta-badges {
       display: flex;
       flex-wrap: wrap;
       gap: var(--space-sm);
       align-items: center;
     }
 
-    .coord-pill {
+    .chip {
       display: inline-flex;
       align-items: center;
       gap: var(--space-xs);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      letter-spacing: var(--label-tracking);
-      text-transform: uppercase;
       padding: var(--space-xs) var(--space-sm);
       border-radius: var(--rounded);
-      background: var(--emerald-tint);
-      color: var(--tertiary);
-      border: 1px solid color-mix(in srgb, var(--tertiary) 35%, transparent);
-    }
-    .coord-pill.gold {
-      background: var(--gold-tint);
-      color: var(--primary);
-      border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: 0.03em;
+      background: var(--surface-container-high);
+      border: var(--hairline);
+      color: var(--on-surface-variant);
+      white-space: nowrap;
     }
 
-    /* KPI Summary Strip */
+    .chip-emerald {
+      background: var(--emerald-tint);
+      border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+      color: var(--primary);
+    }
+
+    .chip-sky {
+      background: var(--sky-tint);
+      border-color: color-mix(in srgb, var(--tertiary) 35%, transparent);
+      color: var(--tertiary);
+    }
+
+    .chip-amber {
+      background: var(--amber-tint);
+      border-color: color-mix(in srgb, var(--data-3) 35%, transparent);
+      color: var(--data-3);
+    }
+
+    /* Headline KPI Strip */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
       gap: var(--space-md);
     }
 
     .kpi-tile {
-      background: var(--surface-container-low);
+      background: var(--background);
       border: var(--hairline);
       border-radius: var(--rounded);
       padding: var(--space-md);
@@ -250,74 +265,76 @@
       gap: var(--space-xs);
     }
 
-    .kpi-label {
+    .data-label {
       font-family: var(--font-label);
       font-size: var(--label-size);
       letter-spacing: var(--label-tracking);
       text-transform: uppercase;
       color: var(--on-surface-variant);
+      margin: 0;
     }
 
-    .kpi-value {
+    .metric-value {
       font-family: var(--font-headline);
-      font-weight: 500;
-      font-size: clamp(1.5rem, 1.25rem + 0.8vw, 1.9rem);
-      line-height: 1.1;
+      font-size: clamp(1.35rem, 1.15rem + 0.7vw, 1.75rem);
+      font-weight: 600;
       font-variant-numeric: tabular-nums;
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.15;
       color: var(--on-surface);
     }
-    .kpi-value.accent-gold { color: var(--primary); }
-    .kpi-value.accent-emerald { color: var(--tertiary); }
 
-    .kpi-sub {
+    .metric-delta {
       font-family: var(--font-label);
       font-size: var(--label-size);
-      color: var(--sky);
+      color: var(--primary);
     }
 
-    /* Horizontally Swipeable Touch Tab Bar */
-    .tab-nav-wrap {
+    .metric-note {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+    }
+
+    /* Horizontally Touch-Swipeable Navigation Tabs */
+    .nav-shell {
       position: relative;
-      background: var(--glass-surface);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: var(--hairline);
+      background: var(--surface-container-low);
+      border: var(--glass-border);
       border-radius: var(--rounded-lg);
       padding: var(--space-xs);
     }
 
     .tab-bar {
       display: flex;
-      gap: var(--space-xs);
+      gap: var(--space-sm);
       overflow-x: auto;
+      scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
-      scroll-snap-type: x proximity;
       scrollbar-width: none;
+      padding: var(--space-xs);
     }
     .tab-bar::-webkit-scrollbar { display: none; }
 
     .tab-btn {
-      flex: 1 0 auto;
-      min-height: 44px;
-      padding: var(--space-sm) var(--space-md);
-      border: 1px solid transparent;
-      border-radius: var(--rounded);
-      background: transparent;
-      color: var(--on-surface-variant);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      cursor: pointer;
+      flex: 0 0 auto;
+      scroll-snap-align: start;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--on-surface-variant);
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: var(--body-size);
+      cursor: pointer;
       white-space: nowrap;
-      scroll-snap-align: start;
-      transition: background-color var(--dur-micro) var(--ease-out),
-                  color var(--dur-micro) var(--ease-out),
-                  box-shadow var(--dur-micro) var(--ease-out);
+      transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out);
     }
 
     .tab-btn:hover {
@@ -326,33 +343,31 @@
     }
 
     .tab-btn[aria-selected="true"] {
-      background: var(--primary);
-      color: var(--on-primary);
-      font-weight: 600;
-      box-shadow: 0 0 0 1px var(--primary);
+      background: var(--emerald-tint);
+      color: var(--primary);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 45%, transparent);
     }
 
-    /* Panels & Glassmorphic Cards */
+    /* Panels & Containers */
     .tab-panel {
       display: none;
       gap: var(--space-lg);
+      animation: panelFade var(--dur-short) var(--ease-out);
     }
     .tab-panel.active {
       display: grid;
-      animation: fadeSlide var(--dur-short) var(--ease-out);
     }
 
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(6px); }
+    @keyframes panelFade {
+      from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     .panel {
-      background: var(--glass-surface);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: var(--hairline);
-      box-shadow: var(--panel-highlight);
+      background: var(--panel-gradient);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: var(--glass-border);
       border-radius: var(--rounded-lg);
       padding: var(--space-lg);
       display: grid;
@@ -369,408 +384,131 @@
       padding-bottom: var(--space-md);
     }
 
-    .panel-title {
+    .section-title {
       font-family: var(--font-headline);
-      font-weight: 500;
       font-size: var(--headline-size);
+      font-weight: 600;
       letter-spacing: var(--heading-tracking);
       margin: 0;
       color: var(--on-surface);
     }
 
-    .panel-subtitle {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      letter-spacing: var(--label-tracking);
-      text-transform: uppercase;
-      color: var(--tertiary);
-      margin-top: var(--space-xs);
+    .section-subtitle {
+      margin: var(--space-xs) 0 0 0;
+      color: var(--on-surface-variant);
+      font-size: var(--body-size);
+      max-width: 65ch;
     }
 
-    /* Buttons & Segmented Controls */
-    .segmented-group {
-      display: inline-flex;
-      flex-wrap: wrap;
-      gap: var(--space-xs);
+    .well {
       background: var(--background);
       border: var(--hairline);
       border-radius: var(--rounded);
-      padding: var(--space-xs);
+      padding: var(--space-md);
     }
 
-    .seg-btn {
+    /* Buttons & Controls */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
       min-height: 44px;
-      padding: var(--space-xs) var(--space-md);
-      border: none;
+      padding: var(--space-sm) var(--space-md);
       border-radius: var(--rounded);
-      background: transparent;
-      color: var(--on-surface-variant);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      cursor: pointer;
-      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
-    }
-    .seg-btn:hover {
+      border: var(--hairline-strong);
       background: var(--surface-container-high);
       color: var(--on-surface);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
     }
-    .seg-btn.active {
-      background: var(--tertiary);
-      color: var(--on-primary);
-      font-weight: 600;
+
+    .btn:hover {
+      background: var(--surface-container);
+      box-shadow: inset 0 0 0 1px var(--outline);
     }
-    .seg-btn.gold.active {
-      background: var(--primary);
-      color: var(--on-primary);
+
+    .btn:active {
+      transform: translateY(1px);
     }
 
     .btn-primary {
-      min-height: 44px;
-      padding: var(--space-sm) var(--space-md);
-      border-radius: var(--rounded);
-      border: none;
       background: var(--primary);
       color: var(--on-primary);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
+      border-color: transparent;
       font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-sm);
-      transition: background-color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
-    }
-    .btn-primary:hover { background: var(--on-primary-container); }
-    .btn-primary:active { transform: scale(0.98); }
-
-    .btn-secondary {
-      min-height: 44px;
-      padding: var(--space-sm) var(--space-md);
-      border-radius: var(--rounded);
-      border: var(--hairline-strong);
-      background: var(--surface-container-low);
-      color: var(--on-surface);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-sm);
-      transition: background-color var(--dur-micro) var(--ease-out);
-    }
-    .btn-secondary:hover { background: var(--surface-container-high); }
-
-    /* MAP TAB */
-    .map-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-      gap: var(--space-lg);
     }
 
-    .map-well {
-      position: relative;
-      background: var(--background);
-      border: var(--hairline);
-      border-radius: var(--rounded);
-      overflow: hidden;
+    .btn-primary:hover {
+      background: color-mix(in srgb, var(--primary) 88%, var(--on-surface));
+      box-shadow: none;
     }
 
-    #expedition-map {
-      height: 520px;
-      min-height: 440px;
-      width: 100%;
-      background: var(--map-sat-ocean);
-    }
-
-    .map-hud-bar {
+    .btn-pill-group {
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
       gap: var(--space-sm);
-      padding: var(--space-sm) var(--space-md);
-      background: var(--surface-container-low);
-      border-top: var(--hairline);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      color: var(--on-surface-variant);
     }
 
-    .map-sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-sm);
-      max-height: 580px;
-      overflow-y: auto;
-      padding-right: var(--space-xs);
-    }
-
-    .waypoint-btn {
-      width: 100%;
-      text-align: left;
-      padding: var(--space-sm) var(--space-md);
+    .pill-btn {
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
       border-radius: var(--rounded);
       border: var(--hairline);
-      background: var(--surface-container-low);
-      color: var(--on-surface);
+      background: var(--background);
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
       cursor: pointer;
-      display: grid;
+      display: inline-flex;
+      align-items: center;
       gap: var(--space-xs);
-      transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
     }
-    .waypoint-btn:hover { background: var(--surface-container-high); }
-    .waypoint-btn.active {
+
+    .pill-btn:hover {
+      color: var(--on-surface);
       background: var(--surface-container-high);
-      box-shadow: inset 3px 0 0 var(--primary);
     }
 
-    .wp-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--space-sm);
-    }
-    .wp-day {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      font-weight: 600;
-      color: var(--primary);
-    }
-    .wp-elev {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      color: var(--tertiary);
-    }
-    .wp-name {
-      font-weight: 600;
-      font-size: var(--body-size);
-    }
-    .wp-meta {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      color: var(--on-surface-variant);
-    }
-
-    /* Leaflet Custom DivIcons & Popups */
-    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-      background: var(--surface-container);
-      color: var(--on-surface);
-      border: var(--hairline-strong);
-      border-radius: var(--rounded);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-    }
-    .leaflet-popup-content {
-      margin: var(--space-md);
-      font-family: var(--font-body);
-      font-size: 0.875rem;
-      line-height: 1.5;
-    }
-    .popup-day-tag {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .popup-title {
-      font-family: var(--font-headline);
-      font-size: 1.25rem;
-      margin: var(--space-xs) 0;
-      color: var(--on-surface);
-    }
-    .popup-gps {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      color: var(--sky);
-      margin: var(--space-xs) 0;
-    }
-    .popup-copy-btn {
-      margin-top: var(--space-sm);
-      width: 100%;
-      min-height: 40px;
-      padding: var(--space-xs) var(--space-sm);
-      border-radius: var(--rounded);
-      border: 1px solid color-mix(in srgb, var(--tertiary) 45%, transparent);
+    .pill-btn[aria-pressed="true"] {
       background: var(--emerald-tint);
-      color: var(--tertiary);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .popup-copy-btn:hover { background: var(--tertiary); color: var(--on-primary); }
-
-    .map-day-pin {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: var(--rounded-full);
-      background: var(--background);
-      border: 2px solid var(--primary);
       color: var(--primary);
-      font-family: var(--font-label);
-      font-size: 11px;
-      font-weight: 700;
-      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.7);
-    }
-    .map-day-pin.ebc {
-      border-color: var(--tertiary);
-      color: var(--on-primary);
-      background: var(--tertiary);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 50%, transparent);
     }
 
-    .geo-label-country {
-      font-family: var(--font-label);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: rgba(242, 236, 225, 0.55);
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-      white-space: nowrap;
-      pointer-events: none;
-    }
-    .geo-label-province {
-      font-family: var(--font-label);
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgba(124, 196, 232, 0.85);
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
-      white-space: nowrap;
-      pointer-events: none;
-    }
-    .geo-label-city {
-      font-family: var(--font-label);
-      font-size: 10px;
-      color: var(--on-surface);
-      background: rgba(15, 23, 42, 0.78);
-      border: 1px solid rgba(229, 178, 93, 0.35);
-      padding: 1px 5px;
-      border-radius: 3px;
-      white-space: nowrap;
-      pointer-events: none;
-    }
-
-    /* TELEMETRY TAB */
-    .chart-well {
-      background: var(--background);
-      border: var(--hairline);
-      border-radius: var(--rounded);
-      padding: var(--space-md);
-      min-height: 360px;
-      position: relative;
-    }
-
-    .telemetry-stats-grid {
+    /* Map Layout */
+    .map-workspace {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-      gap: var(--space-md);
-    }
-
-    .info-box {
-      background: var(--surface-container-low);
-      border: var(--hairline);
-      border-radius: var(--rounded);
-      padding: var(--space-md);
-      display: grid;
-      gap: var(--space-xs);
-    }
-
-    .acclim-table-wrap {
-      overflow-x: auto;
-    }
-    table.data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-    table.data-table th {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      letter-spacing: var(--label-tracking);
-      text-transform: uppercase;
-      color: var(--on-surface-variant);
-      text-align: left;
-      padding: var(--space-sm) var(--space-md);
-      border-bottom: var(--hairline-strong);
-    }
-    table.data-table td {
-      padding: var(--space-sm) var(--space-md);
-      border-bottom: var(--hairline);
-      color: var(--on-surface);
-      vertical-align: top;
-    }
-    table.data-table td.num, table.data-table th.num {
-      text-align: right;
-      font-family: var(--font-label);
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* ASTRO & SIMULATOR TAB */
-    .astro-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
       gap: var(--space-lg);
       align-items: start;
     }
 
-    .astro-canvas-well {
-      background: var(--background);
-      border: var(--hairline);
-      border-radius: var(--rounded);
-      overflow: hidden;
-      position: relative;
-    }
-
-    #astro-canvas {
-      display: block;
-      width: 100%;
-      height: 360px;
-      min-height: 320px;
-    }
-
-    .astro-hud-overlay {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--space-sm);
-      padding: var(--space-sm) var(--space-md);
-      background: var(--surface-container-low);
-      border-top: var(--hairline);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-    }
-
-    .controls-stack {
+    .map-stage {
       display: grid;
       gap: var(--space-md);
     }
 
-    .control-group {
-      background: var(--surface-container-low);
-      border: var(--hairline);
-      border-radius: var(--rounded);
-      padding: var(--space-md);
-      display: grid;
-      gap: var(--space-sm);
+    .map-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--space-md);
     }
 
-    .control-label-row {
+    .control-group {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--space-sm);
+      flex-direction: column;
+      gap: var(--space-xs);
     }
+
     .control-label {
       font-family: var(--font-label);
       font-size: var(--label-size);
@@ -778,260 +516,479 @@
       text-transform: uppercase;
       color: var(--on-surface-variant);
     }
-    .control-val {
-      font-family: var(--font-label);
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--primary);
-    }
 
-    .pill-select-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
-      gap: var(--space-xs);
-    }
-
-    .param-btn {
+    select.select-input, input.num-input {
       min-height: 44px;
+      padding: var(--space-sm) var(--space-xl) var(--space-sm) var(--space-md);
       border-radius: var(--rounded);
       border: var(--hairline-strong);
+      background: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      appearance: none;
+      cursor: pointer;
+    }
+
+    select.select-input {
+      background-image: linear-gradient(45deg, transparent 50%, var(--on-surface-variant) 50%), linear-gradient(135deg, var(--on-surface-variant) 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 13px) calc(50% - 2px);
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+
+    #expedition-map {
+      height: 470px;
+      min-height: 400px;
+      width: 100%;
+      border-radius: var(--rounded);
+      border: var(--hairline-strong);
+      background: var(--map-ocean-sat);
+      z-index: 1;
+    }
+
+    .leaflet-container {
+      font-family: var(--font-body);
+      background: var(--map-ocean-sat);
+    }
+
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+      background: var(--surface-container);
+      color: var(--on-surface);
+      border: var(--hairline-strong);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+    .leaflet-popup-content {
+      margin: var(--space-md);
+      font-size: var(--body-size);
+      line-height: 1.45;
+    }
+    .leaflet-container a.leaflet-popup-close-button {
+      color: var(--on-surface-variant);
+      padding: 6px;
+    }
+
+    .day-strip {
+      display: flex;
+      gap: var(--space-sm);
+      overflow-x: auto;
+      padding-bottom: var(--space-xs);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .day-jump-btn {
+      flex: 0 0 auto;
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded);
+      border: var(--hairline);
       background: var(--background);
       color: var(--on-surface-variant);
       font-family: var(--font-label);
       font-size: var(--label-size);
-      font-weight: 500;
       cursor: pointer;
-      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
-    }
-    .param-btn:hover { background: var(--surface-container-high); color: var(--on-surface); }
-    .param-btn.active {
-      background: var(--primary);
-      color: var(--on-primary);
-      font-weight: 600;
-      border-color: var(--primary);
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
     }
 
-    .status-banner {
-      padding: var(--space-md);
-      border-radius: var(--rounded);
-      border: 1px solid var(--outline-variant);
-      background: var(--emerald-tint);
+    .day-jump-btn strong {
       color: var(--on-surface);
+      font-weight: 600;
+    }
+
+    .day-jump-btn[aria-pressed="true"] {
+      background: var(--emerald-tint);
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+    .day-jump-btn[aria-pressed="true"] strong {
+      color: var(--primary);
+    }
+
+    /* Stop Inspector Card */
+    .stop-inspector {
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    .admin-hierarchy {
       display: grid;
       gap: var(--space-xs);
-    }
-    .status-banner.warning {
-      background: var(--warning-tint);
-      border-color: color-mix(in srgb, var(--warning) 45%, transparent);
-    }
-    .status-banner.error {
-      background: var(--error-tint);
-      border-color: color-mix(in srgb, var(--error) 45%, transparent);
-    }
-    .status-banner-title {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: var(--label-tracking);
-    }
-
-    .preset-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
-      gap: var(--space-sm);
-    }
-    .preset-item {
       background: var(--background);
       border: var(--hairline);
       border-radius: var(--rounded);
-      padding: var(--space-sm) var(--space-md);
+      padding: var(--space-md);
     }
 
-    .gear-alert {
-      background: var(--gold-tint);
-      border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
-      border-radius: var(--rounded);
-      padding: var(--space-md);
+    .admin-row {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-md);
+      font-size: var(--label-size);
+      border-bottom: var(--hairline);
+      padding-bottom: var(--space-xs);
+    }
+    .admin-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .admin-key {
+      font-family: var(--font-label);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      letter-spacing: 0.04em;
+    }
+    .admin-val {
+      font-weight: 600;
+      color: var(--on-surface);
+      text-align: right;
+    }
+
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      padding-top: var(--space-xs);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: var(--rounded-full);
+      display: inline-block;
+    }
+    .swatch-land { background: var(--primary); }
+    .swatch-rail { background: var(--tertiary); }
+    .swatch-pass { background: var(--data-3); }
+    .swatch-flight {
+      border: 2px dashed var(--secondary);
+      background: transparent;
+    }
+
+    .copy-feedback {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--primary);
+      min-height: 1.25rem;
+    }
+
+    /* Telemetry Chart */
+    .chart-box {
+      position: relative;
+      min-height: 360px;
+      height: 380px;
+      width: 100%;
+    }
+
+    .card-grid {
       display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+
+    /* Astrophotography Simulator */
+    .astro-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .sky-canvas-wrap {
+      position: relative;
+      background: var(--map-ocean-astro);
+      border: var(--hairline-strong);
+      border-radius: var(--rounded);
+      overflow: hidden;
+      min-height: 320px;
+    }
+
+    #astro-canvas {
+      display: block;
+      width: 100%;
+      height: 320px;
+    }
+
+    .canvas-hud {
+      position: absolute;
+      bottom: var(--space-sm);
+      left: var(--space-sm);
+      right: var(--space-sm);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-xs);
+      pointer-events: none;
+    }
+
+    .hud-pill {
+      background: rgba(15, 23, 42, 0.85);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: 4px var(--space-sm);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface);
+    }
+
+    .slider-block {
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .slider-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: var(--space-sm);
     }
 
-    /* ACCORDION CARDS (Itinerary & Expenses) */
+    input[type="range"] {
+      width: 100%;
+      min-height: 44px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Night Sky Timeline Bar */
+    .astro-timeline-bar {
+      display: grid;
+      grid-template-columns: 1.4fr 4.8fr 3.8fr;
+      border-radius: var(--rounded);
+      overflow: hidden;
+      border: var(--hairline-strong);
+      min-height: 52px;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+    }
+    .tl-seg {
+      padding: var(--space-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .tl-twilight {
+      background: var(--surface-container-high);
+      color: var(--on-surface-variant);
+    }
+    .tl-darksky {
+      background: var(--emerald-tint);
+      color: var(--primary);
+      border-left: 1px solid var(--primary);
+      border-right: 1px solid var(--data-3);
+    }
+    .tl-moon {
+      background: var(--amber-tint);
+      color: var(--data-3);
+    }
+
+    /* Accordions for Itinerary & Checklists */
     .accordion-list {
       display: grid;
       gap: var(--space-sm);
     }
 
-    .acc-card {
-      background: var(--surface-container-low);
+    .accordion-item {
+      background: var(--surface-container);
       border: var(--hairline);
-      border-radius: var(--rounded);
+      border-radius: var(--rounded-lg);
       overflow: hidden;
     }
 
-    .acc-trigger {
+    .accordion-trigger {
       width: 100%;
       min-height: 56px;
       padding: var(--space-md);
       background: transparent;
       border: none;
-      color: var(--on-surface);
-      text-align: left;
-      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: var(--space-md);
+      text-align: left;
+      cursor: pointer;
       transition: background-color var(--dur-micro) var(--ease-out);
     }
-    .acc-trigger:hover { background: var(--surface-container-high); }
 
-    .acc-head-main {
+    .accordion-trigger:hover {
+      background: var(--surface-container-high);
+    }
+
+    .accordion-title-group {
+      display: grid;
+      gap: 2px;
+    }
+
+    .accordion-day-tag {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: var(--label-tracking);
+    }
+
+    .accordion-heading {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+
+    .accordion-right {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       gap: var(--space-sm);
-    }
-    .acc-day-badge {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: var(--rounded);
-      background: var(--gold-tint);
-      color: var(--primary);
-      border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
-    }
-    .acc-title {
-      font-weight: 600;
-      font-size: var(--subhead-size);
-    }
-    .acc-meta-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-sm);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      color: var(--tertiary);
+      flex-shrink: 0;
     }
 
-    .acc-body {
+    .accordion-body {
       display: none;
       padding: 0 var(--space-md) var(--space-md) var(--space-md);
       border-top: var(--hairline);
       gap: var(--space-md);
     }
-    .acc-card.open .acc-body {
+
+    .accordion-item.open .accordion-body {
       display: grid;
       padding-top: var(--space-md);
     }
 
-    .acc-detail-grid {
+    .accordion-chevron {
+      transition: transform var(--dur-short) var(--ease-out);
+      color: var(--on-surface-variant);
+    }
+
+    .accordion-item.open .accordion-chevron {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--body-size);
+    }
+
+    th {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: var(--label-tracking);
+      color: var(--on-surface-variant);
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--hairline-strong);
+    }
+
+    td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--hairline);
+      color: var(--on-surface);
+      vertical-align: top;
+    }
+
+    th.num, td.num {
+      text-align: right;
+      font-family: var(--font-label);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* Expense Controls */
+    .expense-controls-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
       gap: var(--space-md);
+      align-items: end;
     }
 
-    .detail-block {
-      background: var(--background);
-      border: var(--hairline);
-      border-radius: var(--rounded);
-      padding: var(--space-sm) var(--space-md);
-    }
-
-    /* EXPENSES TAB */
-    .expense-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-      gap: var(--space-lg);
-      align-items: start;
-    }
-
-    .input-field {
-      display: grid;
-      gap: var(--space-xs);
-    }
-    .input-field label {
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      letter-spacing: var(--label-tracking);
-      text-transform: uppercase;
-      color: var(--on-surface-variant);
-    }
-    .input-box {
+    .toggle-switch-btn {
+      width: 100%;
       min-height: 44px;
       padding: var(--space-sm) var(--space-md);
-      background: var(--background);
-      border: var(--hairline-strong);
       border-radius: var(--rounded);
+      border: var(--hairline-strong);
+      background: var(--background);
       color: var(--on-surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
       font-family: var(--font-label);
-      font-size: var(--body-size);
-      width: 100%;
+      font-size: var(--label-size);
+    }
+    .toggle-switch-btn[aria-pressed="true"] {
+      background: var(--emerald-tint);
+      border-color: var(--primary);
+      color: var(--primary);
     }
 
-    .checklist-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
-      gap: var(--space-sm);
-    }
-
-    .check-row {
+    /* Checklist items */
+    .checklist-item {
       display: flex;
       align-items: flex-start;
       gap: var(--space-sm);
-      padding: var(--space-sm) var(--space-md);
-      min-height: 44px;
+      padding: var(--space-sm);
       border-radius: var(--rounded);
+      background: var(--background);
       border: var(--hairline);
-      background: var(--surface-container-low);
       cursor: pointer;
+      min-height: 44px;
     }
-    .check-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+    .checklist-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
       margin-top: 2px;
-      accent-color: var(--tertiary);
+      accent-color: var(--primary);
+      cursor: pointer;
       flex-shrink: 0;
     }
 
-    .footer-note {
-      border-top: var(--hairline);
-      padding-top: var(--space-md);
-      font-family: var(--font-label);
-      font-size: var(--label-size);
-      color: var(--on-surface-variant);
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: var(--space-sm);
+    /* Responsive Breakpoints */
+    @container (max-width: 520px) {
+      .astro-timeline-bar {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 900px) {
-      .map-layout, .astro-grid, .expense-grid {
+      .map-workspace, .astro-grid {
         grid-template-columns: 1fr;
-      }
-      #expedition-map {
-        height: 420px;
-        min-height: 400px;
       }
     }
 
     @media (max-width: 640px) {
-      .app-shell {
+      .page-grid {
         padding: var(--space-sm);
         gap: var(--space-md);
       }
-      .hero-header, .panel {
+      .hero-panel, .panel {
         padding: var(--space-md);
       }
-      .tab-btn {
-        padding: var(--space-sm) var(--space-md);
+      #expedition-map {
+        height: 380px;
+        min-height: 360px;
       }
-      #astro-canvas {
-        height: 280px;
-        min-height: 260px;
+      .chart-box {
+        height: 300px;
+        min-height: 280px;
+      }
+      .accordion-right .chip-hide-sm {
+        display: none;
       }
     }
 
@@ -1045,152 +1002,221 @@
   </style>
 </head>
 <body>
-  <main class="app-shell">
+  <main class="page-grid">
     <!-- Hero Header -->
-    <header class="hero-header">
+    <section class="hero-panel" aria-label="Expedition Summary">
       <div class="hero-top">
-        <div class="title-block">
-          <h1>Tibet Spring Peach Blossom, Mt. Everest &amp; <em>Qingzang Railway</em></h1>
-          <div class="deck-line">March 25 – April 3, 2027 &middot; 10 Days / 9 Nights &middot; Private Tour with Local Guide &amp; Driver</div>
-          <p class="hero-lede">
-            Low-altitude entry via Nyingchi (2,900 m) ascending stepwise across Himalayan passes to Everest Base Camp (5,200 m), Lhasa cultural sanctuaries, and the Qingzang Railway soft-sleeper crossing.
+        <div>
+          <p class="hero-kicker">Private Small-Group Tour · Local Guide &amp; Driver · China</p>
+          <h1 class="hero-title">2027 Tibet Spring Peach Blossom, Mt. Everest &amp; Qingzang Railway</h1>
+          <p class="hero-subtitle">
+            10-day acclimatized overland and high-altitude rail loop from Chengdu (Sichuan Province) through Nyingchi, Lhasa, Shigatse, and Rongbuk Everest Base Camp (Tibet Autonomous Region), exiting via the Qingzang Railway to Xining (Qinghai Province).
           </p>
         </div>
-        <div class="hero-badges">
-          <span class="coord-pill gold">Chengdu Assembly &amp; Return</span>
-          <span class="coord-pill">4-Diamond Oxygenated Stays</span>
-          <span class="coord-pill">Pure Play &middot; Zero Shopping</span>
+        <div class="hero-meta-badges">
+          <span class="chip chip-emerald"><i data-lucide="calendar" width="14" height="14" aria-hidden="true"></i> Mar 25 – Apr 3, 2027</span>
+          <span class="chip chip-sky"><i data-lucide="shield-check" width="14" height="14" aria-hidden="true"></i> Pure-Play · Zero Shopping</span>
+          <span class="chip chip-amber"><i data-lucide="moon-star" width="14" height="14" aria-hidden="true"></i> Rongbuk 5200m Confirmed</span>
         </div>
       </div>
 
-      <!-- Top-line KPI Summary Strip -->
       <div class="kpi-grid">
         <div class="kpi-tile">
-          <span class="kpi-label">Land &amp; Rail Distance (Excl. Flights)</span>
-          <span class="kpi-value accent-emerald">4,091 km</span>
-          <span class="kpi-sub">2,135 km Road + 1,956 km Railway</span>
+          <span class="data-label">Surface &amp; Rail Distance</span>
+          <span class="metric-value">4,066 km</span>
+          <span class="metric-delta">2,110 km Drive + 1,956 km Rail</span>
         </div>
         <div class="kpi-tile">
-          <span class="kpi-label">Peak Overnight / Pass Altitude</span>
-          <span class="kpi-value accent-gold">5,200 m / 5,248 m</span>
-          <span class="kpi-sub">EBC Sleep / Gyatsola Pass</span>
+          <span class="data-label">Peak Crossing / Sleep</span>
+          <span class="metric-value">5,248 m</span>
+          <span class="metric-note">Gyatsola Pass · EBC Sleep 5,200 m</span>
         </div>
         <div class="kpi-tile">
-          <span class="kpi-label">Tour Package (Twin Sharing)</span>
-          <span class="kpi-value">9,000 RMB</span>
-          <span class="kpi-sub">+1,100 RMB Single Room Add-on</span>
+          <span class="data-label">EBC Dark-Sky Window</span>
+          <span class="metric-value">5h 23m</span>
+          <span class="metric-delta">21:47 – 03:10 AM (Mar 29–30)</span>
         </div>
         <div class="kpi-tile">
-          <span class="kpi-label">Estimated Airfare Benchmark</span>
-          <span class="kpi-value">SGD 400</span>
-          <span class="kpi-sub">Intl. Return to/from Chengdu</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- Horizontally Touch-Swipeable Tab Bar -->
-    <nav class="tab-nav-wrap" aria-label="Expedition dashboard sections">
-      <div class="tab-bar" role="tablist">
-        <button class="tab-btn" role="tab" id="tab-map" aria-selected="true" aria-controls="panel-map" onclick="switchTab('map')">
-          <span aria-hidden="true">🗺️</span> Map
-        </button>
-        <button class="tab-btn" role="tab" id="tab-telemetry" aria-selected="false" aria-controls="panel-telemetry" onclick="switchTab('telemetry')">
-          <span aria-hidden="true">📈</span> Telemetry
-        </button>
-        <button class="tab-btn" role="tab" id="tab-astro" aria-selected="false" aria-controls="panel-astro" onclick="switchTab('astro')">
-          <span aria-hidden="true">🌌</span> Astro &amp; Simulator
-        </button>
-        <button class="tab-btn" role="tab" id="tab-itinerary" aria-selected="false" aria-controls="panel-itinerary" onclick="switchTab('itinerary')">
-          <span aria-hidden="true">📅</span> Itinerary
-        </button>
-        <button class="tab-btn" role="tab" id="tab-expenses" aria-selected="false" aria-controls="panel-expenses" onclick="switchTab('expenses')">
-          <span aria-hidden="true">💰</span> Expenses
-        </button>
-      </div>
-    </nav>
-
-    <!-- TAB 1: INTERACTIVE ROUTE MAP -->
-    <section id="panel-map" class="tab-panel active" role="tabpanel" aria-labelledby="tab-map">
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Interactive Expedition Route Map</h2>
-            <div class="panel-subtitle">China &middot; Sichuan &middot; Tibet Autonomous Region (TAR) &middot; Qinghai</div>
-          </div>
-          <div class="segmented-group" role="group" aria-label="Map visual style switcher">
-            <button class="seg-btn active" id="map-mode-satellite" onclick="setMapMode('satellite')">High-Res Satellite</button>
-            <button class="seg-btn" id="map-mode-terrain" onclick="setMapMode('terrain')">Topographic / Terrain</button>
-            <button class="seg-btn" id="map-mode-street" onclick="setMapMode('street')">Standard Street</button>
-            <button class="seg-btn" id="map-mode-hybrid" onclick="setMapMode('hybrid')">Satellite Hybrid</button>
-            <button class="seg-btn" id="map-mode-astro" onclick="setMapMode('astro')">Dark Stargazing</button>
-          </div>
-        </div>
-
-        <div class="map-layout">
-          <div class="map-well">
-            <div id="expedition-map" aria-label="Interactive vector route map from Chengdu across Tibet to Xining"></div>
-            <div class="map-hud-bar">
-              <span id="map-mode-status">Active Mode: High-Res Satellite (Vector Relief &amp; Plateau Contours)</span>
-              <span>Scroll Wheel &amp; Pinch-to-Zoom Enabled &middot; Solid: Road &middot; Dashed: Rail &middot; Dotted: Air</span>
-            </div>
-          </div>
-
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-sm);">
-              <span class="kpi-label">Day-Based Waypoints (D1–D10)</span>
-              <button class="btn-secondary" style="min-height:36px; padding: var(--space-xs) var(--space-sm);" onclick="fitFullRoute()">Reset Zoom</button>
-            </div>
-            <div class="map-sidebar" id="waypoint-list"></div>
-          </div>
+          <span class="data-label">Base Package + Flights</span>
+          <span class="metric-value">9,000 RMB</span>
+          <span class="metric-note">+ SGD 400 Airfare · Twin Sharing</span>
         </div>
       </div>
     </section>
 
-    <!-- TAB 2: ELEVATION TELEMETRY -->
-    <section id="panel-telemetry" class="tab-panel" role="tabpanel" aria-labelledby="tab-telemetry">
+    <!-- Swipeable Tab Bar -->
+    <nav class="nav-shell" aria-label="Dashboard Views">
+      <div class="tab-bar" role="tablist">
+        <button class="tab-btn" role="tab" id="tab-btn-map" aria-selected="true" aria-controls="panel-map" onclick="switchTab('map')">
+          <i data-lucide="map" width="18" height="18" aria-hidden="true"></i>
+          <span>Map</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-telemetry" aria-selected="false" aria-controls="panel-telemetry" onclick="switchTab('telemetry')">
+          <i data-lucide="trending-up" width="18" height="18" aria-hidden="true"></i>
+          <span>Telemetry</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-astro" aria-selected="false" aria-controls="panel-astro" onclick="switchTab('astro')">
+          <i data-lucide="sparkles" width="18" height="18" aria-hidden="true"></i>
+          <span>Astro &amp; Simulator</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-itinerary" aria-selected="false" aria-controls="panel-itinerary" onclick="switchTab('itinerary')">
+          <i data-lucide="calendar-days" width="18" height="18" aria-hidden="true"></i>
+          <span>Itinerary</span>
+        </button>
+        <button class="tab-btn" role="tab" id="tab-btn-expenses" aria-selected="false" aria-controls="panel-expenses" onclick="switchTab('expenses')">
+          <i data-lucide="wallet" width="18" height="18" aria-hidden="true"></i>
+          <span>Expenses</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- TAB 1: MAP -->
+    <section id="panel-map" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-map">
       <div class="panel">
         <div class="panel-header">
           <div>
-            <h2 class="panel-title">10-Day Elevation Telemetry (Integer Meters)</h2>
-            <div class="panel-subtitle">Stepwise Acclimatization Profile &middot; Whole-Number Meters Only</div>
+            <h2 class="section-title">Interactive Route Map &amp; Administrative Stops</h2>
+            <p class="section-subtitle">
+              Desktop mouse-wheel zoom and mobile pinch-to-zoom enabled. Flight legs (Chengdu–Nyingchi &amp; Xining–Chengdu) are excluded from the 4,066 km surface total.
+            </p>
           </div>
-          <div class="segmented-group" role="group" aria-label="Elevation chart view toggle">
-            <button class="seg-btn gold active" id="elev-mode-both" onclick="setTelemetryMode('both')">Sleeping + Peak Passes</button>
-            <button class="seg-btn gold" id="elev-mode-sleep" onclick="setTelemetryMode('sleep')">Sleeping Altitude Only</button>
-          </div>
-        </div>
-
-        <div class="chart-well">
-          <canvas id="elevation-chart"></canvas>
-        </div>
-
-        <div class="telemetry-stats-grid">
-          <div class="info-box">
-            <span class="kpi-label">Stepwise Entry Strategy</span>
-            <strong style="color: var(--tertiary);">Nyingchi (2,900 m) before Lhasa (3,650 m)</strong>
-            <span style="color: var(--on-surface-variant); font-size: 0.875rem;">Landing in oxygen-rich Nyingchi reduces acute mountain sickness (AMS) risk before ascending to Central Tibet and Everest.</span>
-          </div>
-          <div class="info-box">
-            <span class="kpi-label">Highest Daytime Passes</span>
-            <strong style="color: var(--primary);">Gyatsola 5,248 m &middot; Gawula 5,211 m</strong>
-            <span style="color: var(--on-surface-variant); font-size: 0.875rem;">Daytime pass crossings include Sejila (4,728 m), Gampala (4,790 m), Gawula (5,211 m), Gyatsola (5,248 m), and Tanggula (5,072 m).</span>
-          </div>
-          <div class="info-box">
-            <span class="kpi-label">Onboard &amp; Room Oxygen Protocol</span>
-            <strong style="color: var(--sky);">1.4 L Carbon Fiber + Diffused Hotel O2</strong>
-            <span style="color: var(--on-surface-variant); font-size: 0.875rem;">Every traveler receives a personal 1.4 L medical oxygen cylinder (6–8 hrs), vehicle emergency steel tanks, glucose oral liquid, and oxygenated hotels.</span>
+          <div class="control-group">
+            <label class="control-label" for="map-layer-select">Map Layer Style</label>
+            <select id="map-layer-select" class="select-input" onchange="changeMapLayer(this.value)">
+              <option value="satellite-dark">High-Res Satellite Vector (Default)</option>
+              <option value="topo-terrain">Topographic / Terrain Contours</option>
+              <option value="street-atlas">Standard Atlas Vector</option>
+              <option value="hybrid-contours">Satellite Hybrid + Grid</option>
+              <option value="stargazing-night">Dark Stargazing Mode</option>
+            </select>
           </div>
         </div>
 
-        <div class="acclim-table-wrap">
-          <table class="data-table">
+        <!-- Quick Day Jump Strip -->
+        <div class="day-strip" id="map-day-strip" aria-label="Select Expedition Day"></div>
+
+        <div class="map-workspace">
+          <div class="map-stage">
+            <div id="expedition-map" role="application" aria-label="Tibet 10-Day Route Vector Map"></div>
+            <div class="map-legend">
+              <span class="legend-item"><span class="legend-swatch swatch-land"></span> Overland Drive (2,110 km)</span>
+              <span class="legend-item"><span class="legend-swatch swatch-rail"></span> Qingzang Railway (1,956 km)</span>
+              <span class="legend-item"><span class="legend-swatch swatch-pass"></span> High Passes (4,728–5,248 m)</span>
+              <span class="legend-item"><span class="legend-swatch swatch-flight"></span> Domestic Flight (Excluded from km)</span>
+            </div>
+          </div>
+
+          <!-- Selected Stop Inspector -->
+          <aside class="stop-inspector well" id="stop-inspector" aria-live="polite">
+            <div>
+              <p class="data-label" id="insp-day-badge">DAY 5 · MARCH 29, 2027</p>
+              <h3 class="section-title" id="insp-title">Everest Base Camp (Rongbuk Monastery)</h3>
+              <p class="section-subtitle" id="insp-summary">Select any Day marker on the map or strip above to inspect full geographic hierarchy, elevation, and GPS pin details.</p>
+            </div>
+
+            <div class="admin-hierarchy" id="insp-admin">
+              <div class="admin-row">
+                <span class="admin-key">Country</span>
+                <span class="admin-val" id="insp-country">China</span>
+              </div>
+              <div class="admin-row">
+                <span class="admin-key">Province / Region</span>
+                <span class="admin-val" id="insp-province">Tibet Autonomous Region (TAR)</span>
+              </div>
+              <div class="admin-row">
+                <span class="admin-key">City / Prefecture</span>
+                <span class="admin-val" id="insp-prefecture">Tingri County, Shigatse Prefecture</span>
+              </div>
+              <div class="admin-row">
+                <span class="admin-key">Elevation</span>
+                <span class="admin-val" id="insp-alt">5,200 m</span>
+              </div>
+              <div class="admin-row">
+                <span class="admin-key">Surface Leg</span>
+                <span class="admin-val" id="insp-dist">350 km Drive</span>
+              </div>
+              <div class="admin-row">
+                <span class="admin-key">Coordinates</span>
+                <span class="admin-val" id="insp-coords">28.1419, 86.8520</span>
+              </div>
+            </div>
+
+            <div class="btn-pill-group">
+              <button class="btn btn-primary" onclick="copySelectedPin()">
+                <i data-lucide="map-pin" width="16" height="16" aria-hidden="true"></i>
+                <span>Copy Google Maps Pin</span>
+              </button>
+              <button class="btn" onclick="resetMapBounds()">
+                <i data-lucide="maximize-2" width="16" height="16" aria-hidden="true"></i>
+                <span>Fit Full Route</span>
+              </button>
+            </div>
+            <div class="copy-feedback" id="map-copy-feedback"></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: TELEMETRY -->
+    <section id="panel-telemetry" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-telemetry">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="section-title">10-Day Elevation Telemetry (Integer Meters)</h2>
+            <p class="section-subtitle">
+              Stepped acclimatization profile starting at low-altitude Nyingchi (2,900 m) before ascending to Lhasa (3,650 m), Shigatse (3,840 m), and Rongbuk EBC (5,200 m).
+            </p>
+          </div>
+          <div class="btn-pill-group" role="group" aria-label="Telemetry View Mode">
+            <button class="pill-btn" id="btn-tel-passes" aria-pressed="true" onclick="setTelemetryMode('passes')">
+              <i data-lucide="mountain" width="15" height="15" aria-hidden="true"></i>
+              <span>Sleeping + Peak Passes</span>
+            </button>
+            <button class="pill-btn" id="btn-tel-sleeping" aria-pressed="false" onclick="setTelemetryMode('sleeping')">
+              <i data-lucide="bed-double" width="15" height="15" aria-hidden="true"></i>
+              <span>Sleeping Altitude Only</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="well">
+          <div class="chart-box">
+            <canvas id="elevation-chart"></canvas>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="well">
+            <p class="data-label">Acclimatization Design</p>
+            <p class="metric-value">2,900 m Entry</p>
+            <p class="section-subtitle">
+              Flying Chengdu (500 m) to Nyingchi (2,900 m) keeps sleeping altitude below the acute jump threshold while allowing daytime adaptation over Sejila Pass (4,728 m).
+            </p>
+          </div>
+          <div class="well">
+            <p class="data-label">Personal &amp; Vehicle Oxygen</p>
+            <p class="metric-value">1.4 L + Steel Tank</p>
+            <p class="section-subtitle">
+              Each traveler receives a 1.4 L carbon-fiber medical oxygen cylinder (6–8 hours) plus a 1,000 ml spray canister, backed by large medical tanks onboard the coach and glucose vials.
+            </p>
+          </div>
+          <div class="well">
+            <p class="data-label">Oxygenated Hotels</p>
+            <p class="metric-value">D3 – D8 Covered</p>
+            <p class="section-subtitle">
+              Diffused &amp; nasal-cannula oxygen rooms with humidifiers in Lhasa (3,650 m) and smart oxygen/floor-heating rooms in Shigatse (3,840 m) &amp; Rongbuk EBC (5,200 m).
+            </p>
+          </div>
+        </div>
+
+        <div class="table-wrap well">
+          <table>
             <thead>
               <tr>
                 <th>Day</th>
-                <th>Overnight Location</th>
-                <th class="num">Sleeping Alt (m)</th>
-                <th>Daytime High Pass</th>
-                <th class="num">Peak Pass (m)</th>
+                <th>Key Waypoint &amp; Region</th>
+                <th class="num">Daytime Peak</th>
+                <th class="num">Overnight Sleep</th>
               </tr>
             </thead>
             <tbody id="telemetry-table-body"></tbody>
@@ -1199,128 +1225,161 @@
       </div>
     </section>
 
-    <!-- TAB 3: ASTROPHOTOGRAPHY & EXPOSURE SIMULATOR -->
-    <section id="panel-astro" class="tab-panel" role="tabpanel" aria-labelledby="tab-astro">
+    <!-- TAB 3: ASTRO & SIMULATOR -->
+    <section id="panel-astro" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-astro">
       <div class="panel">
         <div class="panel-header">
           <div>
-            <h2 class="panel-title">EBC Milky Way Astrophotography &amp; Exposure Simulator</h2>
-            <div class="panel-subtitle">Everest Base Camp (5,200 m) &middot; Night 5 Dark-Sky Planning</div>
+            <h2 class="section-title">Day 5 Rongbuk Guesthouse (5,200 m) &amp; Milky Way Window</h2>
+            <p class="section-subtitle">
+              Confirmed overnight stay at Rongbuk Monastery Guesthouse (fully included in base package, 0 RMB upgrade fee) for dark-sky viewing on March 29–30, 2027.
+            </p>
           </div>
-          <button class="btn-primary" onclick="loadRecommendedAstroPreset()">Load Recommended EBC Preset</button>
+          <span class="chip chip-emerald">0 RMB Upgrade · Confirmed Stay</span>
         </div>
 
+        <!-- Weather & Ephemeris Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-tile">
+            <span class="data-label">Nighttime Low (Mar 29)</span>
+            <span class="metric-value">-15°C to -18°C</span>
+            <span class="metric-note">5°F to 0°F · Strong plateau winds</span>
+          </div>
+          <div class="kpi-tile">
+            <span class="data-label">Daytime High (Mar 29)</span>
+            <span class="metric-value">0°C to -5°C</span>
+            <span class="metric-note">Crisp clear skies · High UV glare</span>
+          </div>
+          <div class="kpi-tile">
+            <span class="data-label">Astro Darkness Begins</span>
+            <span class="metric-value">21:47</span>
+            <span class="metric-delta">Sunset 20:25 · Twilight End 21:47</span>
+          </div>
+          <div class="kpi-tile">
+            <span class="data-label">Moonrise (Mar 30)</span>
+            <span class="metric-value">03:10 AM</span>
+            <span class="metric-note">50% Waning · Sunrise 07:59 AM</span>
+          </div>
+        </div>
+
+        <!-- Visual Timeline Bar -->
+        <div class="well">
+          <p class="data-label" style="margin-bottom: var(--space-sm);">Everest Base Camp Night Timeline (March 29 – March 30, 2027)</p>
+          <div class="astro-timeline-bar">
+            <div class="tl-seg tl-twilight">
+              <strong>20:25 – 21:47</strong>
+              <span>Dusk &amp; Twilight</span>
+            </div>
+            <div class="tl-seg tl-darksky">
+              <strong>21:47 – 03:10 AM (5h 23m Prime Window)</strong>
+              <span>Moonless Bortle-1 Milky Way Window</span>
+            </div>
+            <div class="tl-seg tl-moon">
+              <strong>03:10 AM – 07:59 AM</strong>
+              <span>Moonlit Sky &amp; Everest Sunrise</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Exposure Simulator -->
         <div class="astro-grid">
-          <div>
-            <div class="astro-canvas-well">
+          <div class="well" style="display: grid; gap: var(--space-md);">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm);">
+              <div>
+                <p class="data-label">Interactive Exposure Preview</p>
+                <h3 class="section-title" style="font-size: var(--subhead-size);">Mt. Everest North Face &amp; Milky Way Core</h3>
+              </div>
+              <button class="btn btn-primary" onclick="loadAstroPreset()">
+                <i data-lucide="wand-2" width="15" height="15" aria-hidden="true"></i>
+                <span>Load EBC Preset</span>
+              </button>
+            </div>
+
+            <div class="sky-canvas-wrap">
               <canvas id="astro-canvas"></canvas>
-              <div class="astro-hud-overlay">
-                <span id="astro-hud-settings" style="color: var(--primary);">M Mode &middot; f/2.8 &middot; 15s &middot; ISO 3200</span>
-                <span id="astro-hud-ev" style="color: var(--tertiary);">Exposure Gain: Optimal Milky Way Core</span>
+              <div class="canvas-hud">
+                <span class="hud-pill" id="hud-settings">14mm · f/1.8 · 15s · ISO 3200</span>
+                <span class="hud-pill" id="hud-trail-status">Pinpoint Stars (500-Rule Max: 35s)</span>
               </div>
             </div>
 
-            <div style="margin-top: var(--space-md);" id="astro-warning-box" class="status-banner">
-              <div class="status-banner-title" id="astro-warning-title">500 Rule Check: Pinpoint Stars</div>
-              <div id="astro-warning-text" style="font-size: 0.875rem; color: var(--on-surface-variant);">
-                At 15s on a 14–20mm ultra-wide lens, stars remain crisp and circular with clean Milky Way dust lanes above Mt. Everest.
+            <div class="kpi-grid">
+              <div class="kpi-tile">
+                <span class="data-label">500-Rule Limit</span>
+                <span class="metric-value" id="sim-rule-limit">35 s</span>
+                <span class="metric-delta" id="sim-rule-verdict">Safe — No Star Trailing</span>
+              </div>
+              <div class="kpi-tile">
+                <span class="data-label">Exposure Assessment</span>
+                <span class="metric-value" id="sim-ev-label">Optimal Core</span>
+                <span class="metric-note" id="sim-noise-note">Balanced Milky Way &amp; Low Noise</span>
               </div>
             </div>
           </div>
 
-          <div class="controls-stack">
-            <div class="control-group">
-              <div class="control-label-row">
-                <span class="control-label">Aperture (f-stop)</span>
-                <span class="control-val" id="val-aperture">f/2.8</span>
+          <!-- Controls & Checklist -->
+          <div style="display: grid; gap: var(--space-md);">
+            <div class="well" style="display: grid; gap: var(--space-md);">
+              <p class="data-label">Manual Camera Controls (M Mode)</p>
+
+              <div class="slider-block">
+                <div class="slider-head">
+                  <label class="control-label" for="astro-focal">Lens Focal Length (mm)</label>
+                  <span class="chip" id="val-focal">14 mm</span>
+                </div>
+                <input type="range" id="astro-focal" min="14" max="35" step="1" value="14" oninput="updateAstroSim()">
               </div>
-              <div class="pill-select-row">
-                <button class="param-btn" id="ap-1.4" onclick="setAstroParam('aperture', 1.4)">f/1.4</button>
-                <button class="param-btn active" id="ap-2.8" onclick="setAstroParam('aperture', 2.8)">f/2.8</button>
-                <button class="param-btn" id="ap-4" onclick="setAstroParam('aperture', 4)">f/4</button>
+
+              <div class="slider-block">
+                <div class="slider-head">
+                  <label class="control-label" for="astro-aperture">Aperture (f-stop)</label>
+                  <span class="chip" id="val-aperture">f/1.8</span>
+                </div>
+                <input type="range" id="astro-aperture" min="0" max="5" step="1" value="1" oninput="updateAstroSim()">
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head">
+                  <label class="control-label" for="astro-shutter">Shutter Speed (seconds)</label>
+                  <span class="chip" id="val-shutter">15 s</span>
+                </div>
+                <input type="range" id="astro-shutter" min="5" max="35" step="1" value="15" oninput="updateAstroSim()">
+              </div>
+
+              <div class="slider-block">
+                <div class="slider-head">
+                  <label class="control-label" for="astro-iso">ISO Sensitivity</label>
+                  <span class="chip" id="val-iso">ISO 3200</span>
+                </div>
+                <input type="range" id="astro-iso" min="0" max="4" step="1" value="2" oninput="updateAstroSim()">
               </div>
             </div>
 
-            <div class="control-group">
-              <div class="control-label-row">
-                <span class="control-label">Shutter Speed (500 Rule Check)</span>
-                <span class="control-val" id="val-shutter">15s</span>
-              </div>
-              <div class="pill-select-row">
-                <button class="param-btn" id="sh-5" onclick="setAstroParam('shutter', 5)">5s</button>
-                <button class="param-btn active" id="sh-15" onclick="setAstroParam('shutter', 15)">15s</button>
-                <button class="param-btn" id="sh-25" onclick="setAstroParam('shutter', 25)">25s</button>
-                <button class="param-btn" id="sh-30" onclick="setAstroParam('shutter', 30)">30s</button>
-              </div>
-            </div>
-
-            <div class="control-group">
-              <div class="control-label-row">
-                <span class="control-label">Sensor Sensitivity (ISO)</span>
-                <span class="control-val" id="val-iso">ISO 3200</span>
-              </div>
-              <div class="pill-select-row">
-                <button class="param-btn" id="iso-1600" onclick="setAstroParam('iso', 1600)">1600</button>
-                <button class="param-btn active" id="iso-3200" onclick="setAstroParam('iso', 3200)">3200</button>
-                <button class="param-btn" id="iso-6400" onclick="setAstroParam('iso', 6400)">6400</button>
-                <button class="param-btn" id="iso-12800" onclick="setAstroParam('iso', 12800)">12800</button>
-              </div>
-            </div>
-
-            <div class="gear-alert">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span class="kpi-label" style="color: var(--primary);">Cold Weather &amp; Stability Gear Alert (-15&deg;C Winds)</span>
-              </div>
-              <p style="margin:0; font-size: 0.875rem; color: var(--on-surface);">
-                <strong>Mandatory Stabilization:</strong> Bring a <strong>heavy-duty tripod</strong> (for DSLR/mirrorless) or a sturdy <strong>smartphone tripod mount / tripod selfie stick</strong>. At 5,200 m in freezing plateau gusts (-15&deg;C), handheld long exposures fail completely. Keep spare batteries inside warm inner jacket pockets.
+            <div class="well" style="display: grid; gap: var(--space-sm);">
+              <p class="data-label">Recommended Preset &amp; Gear Checklist</p>
+              <p class="section-subtitle" style="margin: 0;">
+                <strong>Camera Settings:</strong> Manual (M), f/1.4–f/2.8, 15–20s (14–20mm ultra-wide lens), ISO 3200–6400, WB 3800K–4200K, RAW format, 2s shutter delay, Image Stabilization (IS) OFF.
               </p>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 class="kpi-label" style="margin-bottom: var(--space-sm);">Recommended EBC Astrophotography Preset</h3>
-          <div class="preset-grid">
-            <div class="preset-item">
-              <div class="kpi-label">Exposure Mode</div>
-              <strong style="color: var(--primary);">Manual Mode (M)</strong>
-            </div>
-            <div class="preset-item">
-              <div class="kpi-label">Aperture &amp; Lens</div>
-              <strong>f/1.4 – f/2.8 (14–20mm)</strong>
-            </div>
-            <div class="preset-item">
-              <div class="kpi-label">Shutter Speed</div>
-              <strong>15–20s (Zero Trailing)</strong>
-            </div>
-            <div class="preset-item">
-              <div class="kpi-label">ISO Range</div>
-              <strong>ISO 3200 – 6400</strong>
-            </div>
-            <div class="preset-item">
-              <div class="kpi-label">White Balance &amp; Format</div>
-              <strong>3800K – 4200K &middot; RAW</strong>
-            </div>
-            <div class="preset-item">
-              <div class="kpi-label">Stabilization &amp; Timer</div>
-              <strong>2s Delay &middot; IBIS/IS OFF</strong>
+              <div id="astro-checklist" style="display: grid; gap: var(--space-xs); margin-top: var(--space-xs);"></div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 4: 10-DAY ITINERARY ACCORDIONS -->
-    <section id="panel-itinerary" class="tab-panel" role="tabpanel" aria-labelledby="tab-itinerary">
+    <!-- TAB 4: ITINERARY -->
+    <section id="panel-itinerary" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-itinerary">
       <div class="panel">
         <div class="panel-header">
           <div>
-            <h2 class="panel-title">10-Day Expedition Itinerary (Mar 25 – Apr 3, 2027)</h2>
-            <div class="panel-subtitle">Collapsible Day Cards &middot; Road &amp; Rail Distance: 4,091 km (Flights Excluded)</div>
+            <h2 class="section-title">10-Day Expedition Itinerary (March 25 – April 3, 2027)</h2>
+            <p class="section-subtitle">
+              Tap any day to expand full administrative geography, driving/rail distances, meals, hotel oxygen specs, and copyable GPS coordinates.
+            </p>
           </div>
-          <div style="display:flex; gap: var(--space-sm); flex-wrap: wrap;">
-            <button class="btn-secondary" onclick="toggleAllDays(true)">Expand All</button>
-            <button class="btn-secondary" onclick="toggleAllDays(false)">Collapse All</button>
+          <div class="btn-pill-group">
+            <button class="btn" onclick="toggleAllDays(true)">Expand All</button>
+            <button class="btn" onclick="toggleAllDays(false)">Collapse All</button>
           </div>
         </div>
 
@@ -1328,807 +1387,861 @@
       </div>
     </section>
 
-    <!-- TAB 5: EXPENSES, MEALS & PREP CHECKLIST -->
-    <section id="panel-expenses" class="tab-panel" role="tabpanel" aria-labelledby="tab-expenses">
+    <!-- TAB 5: EXPENSES -->
+    <section id="panel-expenses" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-expenses">
       <div class="panel">
         <div class="panel-header">
           <div>
-            <h2 class="panel-title">Meals, Expense Breakdown &amp; Estimator</h2>
-            <div class="panel-subtitle">Transparent 3-Stage Agency Settlement &amp; Personal Budget Planner</div>
+            <h2 class="section-title">Expedition Expense Summary &amp; Budget Estimator</h2>
+            <p class="section-subtitle">
+              Per-person cost breakdown covering the base land &amp; domestic transit package, international Chengdu airfare, and self-paid meal allowance.
+            </p>
+          </div>
+          <span class="chip chip-emerald">Rongbuk 5200m Included (0 RMB Fee)</span>
+        </div>
+
+        <!-- Interactive Cost Toggles -->
+        <div class="well expense-controls-row">
+          <div class="control-group">
+            <span class="control-label">Room Occupancy</span>
+            <button class="toggle-switch-btn" id="btn-single-room" aria-pressed="false" onclick="toggleSingleRoom()">
+              <span>Single Room Supplement (+1,100 RMB)</span>
+              <strong id="lbl-single-status">Twin Sharing</strong>
+            </button>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="extra-meal-slider">Extra Drinks &amp; Add-on Dishes (<span id="val-extra-rmb">200 RMB</span>)</label>
+            <input type="range" id="extra-meal-slider" min="0" max="600" step="50" value="200" oninput="updateExpenses()">
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="sgd-rate-input">RMB per 1 SGD Reference Rate</label>
+            <input type="number" id="sgd-rate-input" class="num-input" min="4.5" max="6.5" step="0.05" value="5.40" oninput="updateExpenses()">
           </div>
         </div>
 
-        <div class="expense-grid">
-          <div style="display: grid; gap: var(--space-md);">
-            <div class="control-group">
-              <span class="kpi-label">Package &amp; Room Selection</span>
-              <div class="segmented-group" style="width:100%;" role="group" aria-label="Room occupancy choice">
-                <button class="seg-btn gold active" style="flex:1;" id="room-twin" onclick="setRoomType('twin')">Twin Sharing (9,000 RMB)</button>
-                <button class="seg-btn gold" style="flex:1;" id="room-single" onclick="setRoomType('single')">Single Room (+1,100 RMB)</button>
-              </div>
-            </div>
-
-            <div class="control-group">
-              <div class="acclim-table-wrap">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Expense Line Item</th>
-                      <th class="num">RMB</th>
-                      <th class="num">SGD Est.</th>
-                    </tr>
-                  </thead>
-                  <tbody id="expense-table-body"></tbody>
-                </table>
-              </div>
-            </div>
-
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: var(--space-md);">
-              <div class="input-field">
-                <label for="input-meal-rate">Self-Paid Meal Rate (RMB / meal)</label>
-                <input class="input-box" type="number" id="input-meal-rate" value="30" min="15" max="200" step="5" oninput="updateExpenseEstimator()">
-              </div>
-              <div class="input-field">
-                <label for="input-extra-allowance">Drinks &amp; Add-on Dishes (RMB)</label>
-                <input class="input-box" type="number" id="input-extra-allowance" value="300" min="0" max="5000" step="50" oninput="updateExpenseEstimator()">
-              </div>
-              <div class="input-field">
-                <label for="input-sgd-rate">Exchange Rate (RMB per 1 SGD)</label>
-                <input class="input-box" type="number" id="input-sgd-rate" value="5.40" min="4.0" max="7.0" step="0.05" oninput="updateExpenseEstimator()">
-              </div>
-            </div>
+        <!-- Cost Totals KPI -->
+        <div class="kpi-grid">
+          <div class="kpi-tile">
+            <span class="data-label">Tour Package (RMB)</span>
+            <span class="metric-value" id="exp-pkg-rmb">9,000 RMB</span>
+            <span class="metric-delta" id="exp-pkg-note">Twin Sharing Base Rate</span>
           </div>
-
-          <div style="display: grid; gap: var(--space-md);">
-            <div class="info-box" style="border-color: color-mix(in srgb, var(--primary) 40%, transparent);">
-              <span class="kpi-label">Included Culinary Highlights</span>
-              <ul style="margin: var(--space-xs) 0 0 0; padding-left: 1.2rem; display: grid; gap: var(--space-xs); font-size: 0.9rem;">
-                <li><strong>Daily Hotel Breakfasts:</strong> Provided each morning across Chengdu, Nyingchi, Lhasa, Shigatse &amp; Everest accommodations.</li>
-                <li><strong>Gifted Specialty Meal 1 (Day 2):</strong> Authentic Lulang Stone Pot Chicken.</li>
-                <li><strong>Gifted Specialty Meal 2 (Day 5):</strong> Warming Mt. Everest Hot Pot at 5,200 m.</li>
-                <li><strong>Day 8 Experience:</strong> Potala Palace Rooftop Afternoon Tea.</li>
-              </ul>
-            </div>
-
-            <div class="info-box">
-              <span class="kpi-label">Self-Paid Meal Estimate (16 Unincluded Main Meals)</span>
-              <p style="margin:0; font-size: 0.9rem; color: var(--on-surface-variant);">
-                Excluding daily breakfasts, the 2 gifted main meals, and Day 8 afternoon tea, budget for <strong>16 self-paid lunches &amp; dinners</strong> at <strong>30 RMB/meal (~480 RMB total)</strong>, plus an adjustable allowance for bottled drinks, snacks, and shared add-on dishes.
-              </p>
-            </div>
-
-            <div class="info-box">
-              <span class="kpi-label">3-Stage Direct Agency Payment Schedule</span>
-              <ol style="margin: var(--space-xs) 0 0 0; padding-left: 1.2rem; display: grid; gap: var(--space-xs); font-size: 0.875rem; color: var(--on-surface-variant);">
-                <li><strong>Stage 1 (Booking Deposit):</strong> 1,000 RMB upon electronic contract signature.</li>
-                <li><strong>Stage 2 (Permit Issuance):</strong> 4,000 RMB once Tibet Travel Permit is approved (~30–40 days prior).</li>
-                <li><strong>Stage 3 (Arrival Balance):</strong> Remaining balance + single supplement (if applicable) settled on arrival.</li>
-              </ol>
-            </div>
+          <div class="kpi-tile">
+            <span class="data-label">Self-Paid Meals + Extras</span>
+            <span class="metric-value" id="exp-meals-rmb">680 RMB</span>
+            <span class="metric-note">16 meals × 30 RMB (480) + Extras</span>
+          </div>
+          <div class="kpi-tile">
+            <span class="data-label">Chengdu Return Airfare</span>
+            <span class="metric-value">SGD 400</span>
+            <span class="metric-note">International / Regional Ticket</span>
+          </div>
+          <div class="kpi-tile">
+            <span class="data-label">Estimated Grand Total</span>
+            <span class="metric-value" id="exp-grand-sgd">SGD 2,193</span>
+            <span class="metric-delta" id="exp-grand-rmb">≈ 11,840 RMB Combined</span>
           </div>
         </div>
 
-        <div style="margin-top: var(--space-sm);">
-          <h3 class="kpi-label" style="margin-bottom: var(--space-sm);">Expedition Readiness &amp; Astro Gear Checklist (Saved Automatically)</h3>
-          <div class="checklist-grid" id="prep-checklist"></div>
+        <!-- Detailed Expense Breakdown Table -->
+        <div class="table-wrap well">
+          <table>
+            <thead>
+              <tr>
+                <th>Cost Category</th>
+                <th>Coverage &amp; Notes</th>
+                <th class="num">RMB</th>
+                <th class="num">SGD Est.</th>
+              </tr>
+            </thead>
+            <tbody id="expense-table-body"></tbody>
+          </table>
+        </div>
+
+        <!-- Inclusions & Payment Schedule -->
+        <div class="card-grid">
+          <div class="well" style="display: grid; gap: var(--space-sm);">
+            <p class="data-label">Package Inclusions (Confirmed)</p>
+            <ul style="margin: 0; padding-left: var(--space-lg); color: var(--on-surface-variant); display: grid; gap: var(--space-xs);">
+              <li><strong style="color: var(--on-surface);">Permits:</strong> Tibet Travel Permits (TTP) &amp; Alien Travel Permits (ATP) for EBC.</li>
+              <li><strong style="color: var(--on-surface);">Domestic Transit:</strong> Chengdu ✈ Nyingchi flight, Lhasa → Xining Qingzang Railway soft-sleeper, Xining ✈ Chengdu flight.</li>
+              <li><strong style="color: var(--on-surface);">Hotels:</strong> 4-star oxygenated hotels (Lhasa, Shigatse), Nyingchi &amp; Chengdu transit hotels, plus confirmed <strong>Rongbuk Monastery Guesthouse (5200m, 0 RMB upgrade fee)</strong>.</li>
+              <li><strong style="color: var(--on-surface);">Meals Included:</strong> Daily hotel breakfasts (D2–D9), 2 gifted specialty meals (Day 2 Lulang Stone Pot Chicken &amp; Day 5 Mt. Everest Hot Pot), and Day 8 Potala Palace Rooftop Afternoon Tea.</li>
+              <li><strong style="color: var(--on-surface);">Sightseeing &amp; Support:</strong> All entry tickets &amp; scenic shuttles, licensed private vehicle, guide/driver gratuities, travel insurance, and medical oxygen cylinders.</li>
+            </ul>
+          </div>
+
+          <div class="well" style="display: grid; gap: var(--space-sm);">
+            <p class="data-label">3-Stage Payment &amp; Self-Paid Meals</p>
+            <ul style="margin: 0; padding-left: var(--space-lg); color: var(--on-surface-variant); display: grid; gap: var(--space-xs);">
+              <li><strong style="color: var(--primary);">Stage 1 (Booking):</strong> 1,000 RMB / person upon signing official National Electronic Travel Contract.</li>
+              <li><strong style="color: var(--primary);">Stage 2 (Permit Issuance):</strong> 4,000 RMB / person once Tibet Travel Permit is approved (~30–40 days prior).</li>
+              <li><strong style="color: var(--primary);">Stage 3 (Arrival Balance):</strong> Remaining 4,000 RMB (+1,100 RMB if single room) settled on arrival.</li>
+              <li><strong style="color: var(--on-surface);">Self-Paid Meals:</strong> 16 lunches &amp; dinners budgeted at 30 RMB/meal (~480 RMB base), plus optional drinks &amp; add-on dishes.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
-
-    <footer class="footer-note">
-      <span>Sources: 2027 Tibet Nyingchi Peach Blossom 10-Day Private Tour Dossier, GSXT &amp; MCT License Briefings, CDC High-Altitude Travel Guidance.</span>
-      <span id="save-status">Preferences saved locally in session</span>
-    </footer>
   </main>
 
   <api-shim></api-shim>
 
   <script>
-    // =========================================================================
-    // 1. EXPEDITION DATA (English only, integer meters, no pax headcounts)
-    // =========================================================================
-    const EXPEDITION_DAYS = [
+    const ROUTE_STOPS = [
       {
-        day: `D1`,
+        day: 1,
+        code: `D1`,
         date: `Mar 25, 2027`,
-        title: `Chengdu Assembly & Transit`,
-        route: `Arrive Chengdu Airport → Transit Hotel`,
+        title: `Chengdu Assembly & Transit Hotel`,
+        country: `China`,
+        province: `Sichuan Province`,
+        prefecture: `Chengdu City`,
         lat: 30.5728,
         lng: 104.0668,
-        gpsLabel: `30.5728, 104.0668`,
-        gmapsQuery: `Chengdu, Sichuan, China`,
         sleepAlt: 500,
-        passName: `None (Sichuan Basin)`,
         passAlt: 500,
-        distanceKm: 45,
-        mode: `road`,
-        meals: `Self-paid (Lunch & Dinner)`,
-        hotel: `Chengdu Tianfu Hotel / Shuangliu Airport Holiday Inn Express or similar`,
-        highlights: `Complimentary airport pickup to transit hotel. Gear check and rest ahead of morning flight into Tibet.`
+        passName: `Chengdu Basin`,
+        driveKm: 0,
+        railKm: 0,
+        legType: `start`,
+        distanceLabel: `Arrival Hub (TFU / CTU)`,
+        hotel: `Chengdu Tianfu / Airport Hotel (or similar)`,
+        meals: `Self-paid`,
+        highlights: `Airport pickup to transit hotel in Chengdu (Sichuan Province). Rest and prepare gear before flying onto the plateau.`
       },
       {
-        day: `D2`,
+        day: 2,
+        code: `D2`,
         date: `Mar 26, 2027`,
-        title: `Nyingchi Peach Blossoms & Lulang`,
-        route: `Chengdu Flight → Nyingchi → Sejila Pass → Lulang Forest → Gala Village`,
-        lat: 29.6491,
+        title: `Nyingchi, Sejila Pass, Lulang & Gala Village`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        prefecture: `Nyingchi / Mainling City`,
+        lat: 29.6489,
         lng: 94.3615,
-        gpsLabel: `29.6491, 94.3615`,
-        gmapsQuery: `Gala Peach Blossom Village, Nyingchi, Tibet`,
         sleepAlt: 2900,
-        passName: `Sejila Pass (Namcha Barwa view)`,
         passAlt: 4728,
-        distanceKm: 180,
-        mode: `road`,
+        passName: `Sejila Pass`,
+        driveKm: 180,
+        railKm: 0,
+        legType: `flight-land`,
+        distanceLabel: `180 km Drive (Flight excluded)`,
+        hotel: `Nyingchi Liyuan Hotel (or similar)`,
         meals: `Hotel Breakfast + Gifted Lulang Stone Pot Chicken`,
-        hotel: `Nyingchi Liyuan Hotel or similar`,
-        highlights: `Stepwise low-altitude arrival at 2,900 m. Cross Sejila Pass (4,728 m) to view Mt. Namcha Barwa, stroll Lulang alpine meadows, and explore Gala Peach Blossom Village.`
+        highlights: `Morning flight Chengdu to Nyingchi Mainling Airport (flight excluded from surface distance). Cross Sejila Pass (4,728 m) to view Mt. Namcha Barwa, stroll Lulang Forest, and explore Gala Peach Blossom Village.`
       },
       {
-        day: `D3`,
+        day: 3,
+        code: `D3`,
         date: `Mar 27, 2027`,
-        title: `Basum Tso Sky Lake to Lhasa`,
-        route: `Nyingchi → Xiuba Castle / Fairy Valley → Bahe Temple → Basum Tso → Lhasa`,
+        title: `Basum Tso Lake & Arrival in Lhasa`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        prefecture: `Lhasa City`,
         lat: 29.6525,
         lng: 91.1721,
-        gpsLabel: `29.6525, 91.1721`,
-        gmapsQuery: `Lhasa, Tibet Autonomous Region, China`,
         sleepAlt: 3650,
-        passName: `Mila Tunnel Corridor`,
-        passAlt: 4700,
-        distanceKm: 500,
-        mode: `road`,
-        meals: `Hotel Breakfast`,
-        hotel: `Lhasa Depeng Hotel or similar (Diffused & Nasal O2 + Humidifier)`,
-        highlights: `Explore 1,600-year-old Xiuba Ancient Castle or Fairy Valley wild peach blossoms, red-walled Bahe Temple, and turquoise Basum Tso Lake before arriving in Lhasa.`
+        passAlt: 3650,
+        passName: `Basum Tso (3,480 m) to Lhasa`,
+        driveKm: 500,
+        railKm: 0,
+        legType: `drive`,
+        distanceLabel: `500 km Drive`,
+        hotel: `Lhasa Depeng / Jimi Oxygenated 4-Star Hotel`,
+        meals: `Hotel Breakfast (L/D self-paid)`,
+        highlights: `Visit Xiuba Ancient Castle / Fairy Valley wild peach blossoms and Bahe Ancient Temple, explore turquoise Basum Tso Lake (3,480 m), then drive the Linla Highway to Lhasa.`
       },
       {
-        day: `D4`,
+        day: 4,
+        code: `D4`,
         date: `Mar 28, 2027`,
-        title: `Yamdrok Lake & Karola Glacier`,
-        route: `Lhasa → Gampala Pass → Yamdrok Lake → Karola Glacier → Shigatse`,
-        lat: 29.2670,
+        title: `Yamdrok Lake, Karola Glacier & Shigatse`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        prefecture: `Shigatse City`,
+        lat: 29.2673,
         lng: 88.8806,
-        gpsLabel: `29.2670, 88.8806`,
-        gmapsQuery: `Shigatse, Tibet Autonomous Region, China`,
         sleepAlt: 3840,
-        passName: `Gampala Pass`,
         passAlt: 4790,
-        distanceKm: 360,
-        mode: `road`,
-        meals: `Hotel Breakfast`,
-        hotel: `Shigatse Yunzuo Starlight Hotel or similar (Humidifier + Smart Controls)`,
-        highlights: `Cross Gampala Pass (4,790 m) overlooking sacred Yamdrok Lake (4,441 m), view the roadside Karola Glacier ice walls, and arrive in Shigatse.`
+        passName: `Gampala Pass (4,790 m) & Karola (5,020 m)`,
+        driveKm: 360,
+        railKm: 0,
+        legType: `drive`,
+        distanceLabel: `360 km Drive`,
+        hotel: `Shigatse Yunzuo Starlight Oxygenated Hotel`,
+        meals: `Hotel Breakfast (L/D self-paid)`,
+        highlights: `Cross Gampala Pass (4,790 m) overlooking sacred Yamdrok Lake (4,441 m), visit Karola Glacier (5,020 m), and continue west to Shigatse.`
       },
       {
-        day: `D5`,
+        day: 5,
+        code: `D5`,
         date: `Mar 29, 2027`,
-        title: `Gawula Pass & EBC Stargazing`,
-        route: `Shigatse → Sakya Monastery → Gawula Pass → Everest Base Camp`,
-        lat: 28.1411,
-        lng: 86.8517,
-        gpsLabel: `28.1411, 86.8517`,
-        gmapsQuery: `Everest Base Camp, Tingri, Shigatse, Tibet`,
+        title: `Sakya, Gawula Pass & Rongbuk EBC`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        prefecture: `Tingri County, Shigatse Prefecture`,
+        lat: 28.1419,
+        lng: 86.8520,
         sleepAlt: 5200,
-        passName: `Gawula Pass (Five 8,000m Peaks)`,
         passAlt: 5211,
-        distanceKm: 350,
-        mode: `road`,
+        passName: `Gawula Pass`,
+        driveKm: 350,
+        railKm: 0,
+        legType: `drive`,
+        distanceLabel: `350 km Drive`,
+        hotel: `Rongbuk Monastery Guesthouse (5,200 m · Included)`,
         meals: `Hotel Breakfast + Gifted Mt. Everest Hot Pot`,
-        hotel: `EBC / Rongbuk area or Everest Town Vienna International (Dual-Mode O2 + Floor Heating)`,
-        highlights: `Visit Sakya Monastery murals, cross Gawula Pass (5,211 m) to see five 8,000m peaks, enjoy hot pot dinner, and photograph the Milky Way over Mt. Everest.`
+        highlights: `Tour Sakya Monastery, cross Gawula Pass (5,211 m) for five 8,000 m peaks, and stay overnight at Rongbuk Monastery Guesthouse (0 RMB upgrade fee). Prime Milky Way window 21:47–03:10 AM.`
       },
       {
-        day: `D6`,
+        day: 6,
+        code: `D6`,
         date: `Mar 30, 2027`,
-        title: `Everest Sunrise & Gyatsola Pass`,
-        route: `Everest Base Camp → Gyatsola Pass → Shigatse`,
-        lat: 28.9167,
-        lng: 87.3833,
-        gpsLabel: `28.9167, 87.3833`,
-        gmapsQuery: `Gyatsola Pass, Tingri, Tibet`,
+        title: `Everest Sunrise & Gyatsola Pass to Shigatse`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        prefecture: `Shigatse City`,
+        lat: 29.2673,
+        lng: 88.8806,
         sleepAlt: 3840,
-        passName: `Gyatsola Pass`,
         passAlt: 5248,
-        distanceKm: 400,
-        mode: `road`,
-        meals: `Hotel Breakfast`,
-        hotel: `Shigatse Yunzuo Starlight Hotel or similar`,
-        highlights: `Witness golden sunrise illuminating Mt. Everest, then cross the expedition's highest road pass at Gyatsola Pass (5,248 m) returning to Shigatse.`
+        passName: `Gyatsola Pass`,
+        driveKm: 400,
+        railKm: 0,
+        legType: `drive`,
+        distanceLabel: `400 km Drive`,
+        hotel: `Shigatse Yunzuo Starlight Oxygenated Hotel`,
+        meals: `Hotel Breakfast (L/D self-paid)`,
+        highlights: `Watch golden sunrise on Mt. Everest after 03:10 AM moonrise, then cross Gyatsola Pass (5,248 m) along G318 back to Shigatse.`
       },
       {
-        day: `D7`,
+        day: 7,
+        code: `D7`,
         date: `Mar 31, 2027`,
-        title: `Tashilhunpo Monastery to Lhasa`,
-        route: `Shigatse → Tashilhunpo Monastery → Yarlung Tsangpo Valley → Lhasa`,
-        lat: 29.2663,
-        lng: 88.8705,
-        gpsLabel: `29.2663, 88.8705`,
-        gmapsQuery: `Tashilhunpo Monastery, Shigatse, Tibet`,
+        title: `Tashilhunpo Monastery & Return to Lhasa`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        prefecture: `Lhasa City`,
+        lat: 29.6525,
+        lng: 91.1721,
         sleepAlt: 3650,
-        passName: `Yarlung Tsangpo River Corridor`,
         passAlt: 3840,
-        distanceKm: 300,
-        mode: `road`,
-        meals: `Hotel Breakfast`,
-        hotel: `Lhasa Depeng Hotel or similar (Oxygenated)`,
-        highlights: `Tour Tashilhunpo Monastery, seat of the Panchen Lama and home to the world's largest bronze Maitreya Buddha, returning along the Yarlung Tsangpo River.`
+        passName: `Yarlung Valley`,
+        driveKm: 300,
+        railKm: 0,
+        legType: `drive`,
+        distanceLabel: `300 km Drive`,
+        hotel: `Lhasa Depeng / Jimi Oxygenated 4-Star Hotel`,
+        meals: `Hotel Breakfast (L/D self-paid)`,
+        highlights: `Morning pilgrimage inside Tashilhunpo Monastery in Shigatse, then drive through the Yarlung Tsangpo River valley back to Lhasa.`
       },
       {
-        day: `D8`,
+        day: 8,
+        code: `D8`,
         date: `Apr 1, 2027`,
-        title: `Potala Palace & Jokhang Pilgrimage`,
-        route: `Potala Palace → Yaowang Mountain → Jokhang Temple → Barkhor Street`,
+        title: `Potala Palace, Jokhang Temple & Barkhor Street`,
+        country: `China`,
+        province: `Tibet Autonomous Region (TAR)`,
+        prefecture: `Lhasa City`,
         lat: 29.6555,
         lng: 91.1186,
-        gpsLabel: `29.6555, 91.1186`,
-        gmapsQuery: `Potala Palace, Lhasa, Tibet`,
         sleepAlt: 3650,
-        passName: `Lhasa City Sanctuary`,
-        passAlt: 3700,
-        distanceKm: 30,
-        mode: `road`,
-        meals: `Hotel Breakfast + Gifted Potala Palace Rooftop Afternoon Tea`,
-        hotel: `Lhasa Depeng Hotel or similar (Oxygenated)`,
-        highlights: `Guided Potala Palace visit with earsets, 50 RMB viewpoint photo at Yaowang Mountain, Rooftop Afternoon Tea, Jokhang Temple, and Barkhor Street kora.`
+        passAlt: 3650,
+        passName: `Lhasa Sacred Circuit`,
+        driveKm: 20,
+        railKm: 0,
+        legType: `drive`,
+        distanceLabel: `20 km Local Transfer`,
+        hotel: `Lhasa Depeng / Jimi Oxygenated 4-Star Hotel`,
+        meals: `Hotel Breakfast + Gifted Potala Rooftop Afternoon Tea`,
+        highlights: `Guided Potala Palace visit with audio earpieces, Potala Rooftop Afternoon Tea, Yaowang Mountain 50 RMB viewpoint, Jokhang Temple, and Barkhor kora.`
       },
       {
-        day: `D9`,
+        day: 9,
+        code: `D9`,
         date: `Apr 2, 2027`,
-        title: `Qingzang Railway Soft-Sleeper`,
-        route: `Lhasa Station → Lake Cuona → Tanggula Pass → Hoh Xil`,
-        lat: 32.8742,
-        lng: 91.9153,
-        gpsLabel: `32.8742, 91.9153`,
-        gmapsQuery: `Tanggula Pass, Qinghai-Tibet Railway`,
+        title: `Qingzang Railway & Tanggula Pass Crossing`,
+        country: `China`,
+        province: `Qinghai Province (Border & Plateau)`,
+        prefecture: `Tanggula Pass · Kekexili Corridor`,
+        lat: 33.0125,
+        lng: 91.7031,
         sleepAlt: 4500,
-        passName: `Tanggula Pass (Rail Crest)`,
         passAlt: 5072,
-        distanceKm: 1956,
-        mode: `rail`,
-        meals: `Hotel Breakfast (Train Dining Self-paid)`,
-        hotel: `Qingzang Railway Soft-Sleeper Cabin (Oxygen-Enriched)`,
-        highlights: `Board the iconic green plateau train. Traverse Lake Cuona, Tanggula Pass (5,072 m), Tuotuo River, and wildlife plains of Hoh Xil (Kekexili).`
+        passName: `Tanggula Pass (Rail)`,
+        driveKm: 0,
+        railKm: 1956,
+        legType: `rail`,
+        distanceLabel: `1,956 km Qingzang Railway`,
+        hotel: `Qingzang Railway Soft-Sleeper (4-Berth Cabin)`,
+        meals: `Hotel Breakfast (Train L/D self-paid)`,
+        highlights: `Board the Qingzang Railway soft-sleeper train in Lhasa; cross Lake Cuona, Tanggula Pass (5,072 m), Tuotuo River, and Kekexili wildlife plains.`
       },
       {
-        day: `D10`,
+        day: 10,
+        code: `D10`,
         date: `Apr 3, 2027`,
-        title: `Xining Arrival & Chengdu Return`,
-        route: `Arrive Xining → Flight to Chengdu → Expedition Ends`,
+        title: `Xining Rail Arrival & Chengdu Return Endpoint`,
+        country: `China`,
+        province: `Qinghai Province → Sichuan Province`,
+        prefecture: `Xining City → Chengdu City`,
         lat: 36.6171,
         lng: 101.7782,
-        gpsLabel: `36.6171, 101.7782`,
-        gmapsQuery: `Xining, Qinghai, China`,
         sleepAlt: 2260,
-        passName: `Qinghai Plateau Descent`,
         passAlt: 2260,
-        distanceKm: 0,
-        mode: `flight`,
+        passName: `Xining Arrival (2,260 m)`,
+        driveKm: 0,
+        railKm: 0,
+        legType: `end`,
+        distanceLabel: `Rail Terminus (Flight Xining–Chengdu excluded)`,
+        hotel: `Tour concludes in Chengdu`,
         meals: `Self-paid`,
-        hotel: `Expedition Concludes in Chengdu (500 m)`,
-        highlights: `Morning arrival in Xining (2,260 m), followed by included domestic flight back to Chengdu (500 m). Flight distance excluded from ground/rail total.`
+        highlights: `Morning rail arrival in Xining (2,260 m, Qinghai Province), followed by included domestic flight back to Chengdu (Sichuan Province) to conclude the 10-day expedition.`
       }
     ];
 
-    const INTERMEDIATE_LANDMARKS = [
-      { name: `Nyingchi Airport`, lat: 29.3036, lng: 94.3353 },
-      { name: `Sejila Pass (4,728m)`, lat: 29.6186, lng: 94.6517 },
-      { name: `Basum Tso Lake`, lat: 30.0083, lng: 93.9242 },
-      { name: `Gampala Pass (4,790m)`, lat: 29.1931, lng: 90.6258 },
-      { name: `Yamdrok Lake (4,441m)`, lat: 28.9725, lng: 90.7136 },
-      { name: `Karola Glacier`, lat: 28.9022, lng: 90.1753 },
-      { name: `Sakya Monastery`, lat: 28.9017, lng: 88.0211 },
-      { name: `Gawula Pass (5,211m)`, lat: 28.5736, lng: 86.9531 }
+    const INTERMEDIATE_PINS = [
+      { name: `Sejila Pass (4,728 m)`, lat: 29.6156, lng: 94.6497, province: `TAR · Nyingchi`, alt: 4728 },
+      { name: `Yamdrok Lake (4,441 m)`, lat: 29.0258, lng: 90.7136, province: `TAR · Shannan / Lhasa`, alt: 4441 },
+      { name: `Gampala Pass (4,790 m)`, lat: 29.1931, lng: 90.6203, province: `TAR · Shannan`, alt: 4790 },
+      { name: `Gawula Pass (5,211 m)`, lat: 28.4317, lng: 86.9942, province: `TAR · Tingri, Shigatse`, alt: 5211 },
+      { name: `Gyatsola Pass (5,248 m)`, lat: 28.9436, lng: 87.4822, province: `TAR · Tingri, Shigatse`, alt: 5248 }
     ];
+
+    const APERTURE_STEPS = [1.4, 1.8, 2.0, 2.8, 4.0, 5.6];
+    const ISO_STEPS = [800, 1600, 3200, 6400, 12800];
 
     const CHECKLIST_ITEMS = [
-      { id: `chk-tripod`, text: `Heavy-duty tripod or smartphone tripod mount / selfie stick for -15°C EBC winds` },
-      { id: `chk-batteries`, text: `Spare camera batteries & powerbank kept warm in inner jacket pockets` },
-      { id: `chk-passport`, text: `Original passport + printed Tibet Travel Permit (TTP) & Alien Travel Permit` },
-      { id: `chk-layers`, text: `Down jacket, windproof shell, thermal base layers & warm gloves for 5,200 m` },
-      { id: `chk-sun`, text: `UV400 sunglasses, SPF 50+ lip balm & sunscreen for plateau glare` },
-      { id: `chk-meds`, text: `Personal altitude medication (consult physician), electrolytes & warm thermos` }
+      { id: `tripod`, label: `Heavy-duty tripod or weighted phone tripod / selfie stick (essential for -18°C gusts)` },
+      { id: `lens`, label: `Ultra-wide lens (14–20mm, f/1.4–f/2.8) or phone ProRAW Night Mode` },
+      { id: `batteries`, label: `Warm spare batteries inside jacket pockets (cold drains Li-ion cells rapidly)` },
+      { id: `layers`, label: `Down parka, windproof shell, thermal gloves & headlamp (red light mode)` },
+      { id: `docs`, label: `Original Passport + printed Tibet Travel Permit (TTP) & border pass` }
     ];
 
-    // =========================================================================
-    // 2. APPLICATION STATE (persisted via notebookAppApi)
-    // =========================================================================
-    const appState = {
+    let appState = {
       activeTab: `map`,
-      mapMode: `satellite`,
-      selectedDayIndex: 4,
-      telemetryMode: `both`,
-      astro: { aperture: 2.8, shutter: 15, iso: 3200 },
-      roomType: `twin`,
-      mealRate: 30,
-      extraAllowance: 300,
-      sgdRate: 5.40,
+      mapLayer: `satellite-dark`,
+      selectedDay: 5,
+      telemetryMode: `passes`,
+      astro: { focal: 14, apertureIdx: 1, shutter: 15, isoIdx: 2 },
+      expenses: { singleRoom: false, extraAllowance: 200, sgdRate: 5.40 },
+      expandedDays: [5],
       checklist: {}
     };
 
-    function getCssToken(name) {
+    let mapInstance = null;
+    let mapLayersGroup = null;
+    let routeLayersGroup = null;
+    let elevationChart = null;
+    let worldCountriesGeo = null;
+
+    function getCssVar(name) {
       return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     }
 
     async function persistState() {
-      const statusEl = document.getElementById(`save-status`);
       if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
         try {
           await window.notebookAppApi.setAppState(appState);
-          if (statusEl) statusEl.textContent = `Preferences saved`;
         } catch (e) {
-          if (statusEl) statusEl.textContent = `Session preferences active`;
+          // Ignore transient host persistence error
         }
       }
     }
 
-    // =========================================================================
-    // 3. TAB SWITCHING & ACCORDIONS
-    // =========================================================================
     function switchTab(tabId) {
       appState.activeTab = tabId;
       const tabs = [`map`, `telemetry`, `astro`, `itinerary`, `expenses`];
-      tabs.forEach(function (id) {
-        const btn = document.getElementById(`tab-` + id);
-        const panel = document.getElementById(`panel-` + id);
-        if (btn) btn.setAttribute(`aria-selected`, id === tabId ? `true` : `false`);
-        if (panel) {
-          if (id === tabId) panel.classList.add(`active`);
-          else panel.classList.remove(`active`);
-        }
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const panel = document.getElementById(`panel-${t}`);
+        if (btn) btn.setAttribute(`aria-selected`, t === tabId ? `true` : `false`);
+        if (panel) panel.classList.toggle(`active`, t === tabId);
       });
 
-      if (tabId === `map` && leafletMap) {
-        setTimeout(function () { leafletMap.invalidateSize(); }, 60);
+      if (tabId === `map` && mapInstance) {
+        setTimeout(() => {
+          mapInstance.invalidateSize();
+        }, 60);
       }
       if (tabId === `telemetry` && elevationChart) {
-        setTimeout(function () { elevationChart.resize(); }, 60);
+        setTimeout(() => {
+          elevationChart.resize();
+        }, 60);
       }
       if (tabId === `astro`) {
-        setTimeout(drawAstroCanvas, 60);
+        setTimeout(() => {
+          drawAstroCanvas();
+        }, 60);
       }
       persistState();
     }
 
-    function toggleDayAccordion(idx) {
-      const card = document.getElementById(`acc-day-` + idx);
-      if (!card) return;
-      const isOpen = card.classList.contains(`open`);
-      if (isOpen) card.classList.remove(`open`);
-      else card.classList.add(`open`);
-      const btn = card.querySelector(`.acc-trigger`);
-      if (btn) btn.setAttribute(`aria-expanded`, !isOpen ? `true` : `false`);
+    function initDayJumpStrip() {
+      const strip = document.getElementById(`map-day-strip`);
+      if (!strip) return;
+      strip.innerHTML = ROUTE_STOPS.map(s => `
+        <button class="day-jump-btn" id="jump-day-${s.day}" aria-pressed="${s.day === appState.selectedDay ? `true` : `false`}" onclick="selectMapDay(${s.day})">
+          <strong>${s.code} · ${s.date.replace(`, 2027`, ``)}</strong>
+          <span>${s.prefecture.split(`,`)[0]} · ${s.sleepAlt.toLocaleString()} m</span>
+        </button>
+      `).join(``);
     }
 
-    function toggleAllDays(expand) {
-      EXPEDITION_DAYS.forEach(function (_, idx) {
-        const card = document.getElementById(`acc-day-` + idx);
-        if (!card) return;
-        if (expand) card.classList.add(`open`);
-        else card.classList.remove(`open`);
-        const btn = card.querySelector(`.acc-trigger`);
-        if (btn) btn.setAttribute(`aria-expanded`, expand ? `true` : `false`);
-      });
-    }
-
-    // =========================================================================
-    // 4. INTERACTIVE VECTOR MAP (Leaflet + Natural Earth + 5 Style Modes)
-    // =========================================================================
-    let leafletMap = null;
-    let mapBaseLayer = null;
-    let mapGridLayer = null;
-    let mapTerrainLayer = null;
-    let mapRouteBounds = null;
-    let dayMarkers = [];
-
-    function copyGpsToClipboard(gpsText, placeName, btnEl) {
-      const payload = gpsText + ` (` + placeName + `)`;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(payload).catch(function () {});
-      }
-      if (btnEl) {
-        btnEl.textContent = `Copied GPS for Google Maps!`;
-        setTimeout(function () {
-          btnEl.textContent = `Copy GPS for Google Maps`;
-        }, 2200);
-      }
-    }
-
-    function selectWaypoint(idx) {
-      appState.selectedDayIndex = idx;
-      const items = document.querySelectorAll(`.waypoint-btn`);
-      items.forEach(function (el, i) {
-        if (i === idx) el.classList.add(`active`);
-        else el.classList.remove(`active`);
-      });
-      const wp = EXPEDITION_DAYS[idx];
-      if (leafletMap && wp) {
-        leafletMap.flyTo([wp.lat, wp.lng], 6, { duration: 0.75 });
-        if (dayMarkers[idx]) dayMarkers[idx].openPopup();
-      }
-      persistState();
-    }
-
-    function fitFullRoute() {
-      if (leafletMap && mapRouteBounds) {
-        leafletMap.fitBounds(mapRouteBounds, { padding: [36, 36] });
-      }
-    }
-
-    function setMapMode(mode) {
-      appState.mapMode = mode;
-      const modes = [`satellite`, `terrain`, `street`, `hybrid`, `astro`];
-      modes.forEach(function (m) {
-        const b = document.getElementById(`map-mode-` + m);
-        if (b) {
-          if (m === mode) b.classList.add(`active`);
-          else b.classList.remove(`active`);
-        }
-      });
-
-      const mapEl = document.getElementById(`expedition-map`);
-      const statusEl = document.getElementById(`map-mode-status`);
-
-      const paletteMap = {
-        satellite: {
-          ocean: getCssToken(`--map-sat-ocean`),
-          land: getCssToken(`--map-sat-land`),
-          border: `#3E584D`,
-          plateau: getCssToken(`--map-sat-plateau`),
-          gridOpacity: 0.14,
-          label: `Active Mode: High-Res Satellite (Vector Plateau Shading & Himalayan Relief)`
-        },
-        terrain: {
-          ocean: getCssToken(`--map-topo-ocean`),
-          land: getCssToken(`--map-topo-land`),
-          border: `#52796F`,
-          plateau: `#2D4037`,
-          gridOpacity: 0.35,
-          label: `Active Mode: Topographic / Terrain (Elevation Contours & River Basins)`
-        },
-        street: {
-          ocean: getCssToken(`--map-street-ocean`),
-          land: getCssToken(`--map-street-land`),
-          border: `#64748B`,
-          plateau: `#283548`,
-          gridOpacity: 0.2,
-          label: `Active Mode: Standard Street & Transit Atlas (Rail & Highway Corridors)`
-        },
-        hybrid: {
-          ocean: getCssToken(`--map-sat-ocean`),
-          land: `#182622`,
-          border: `#7CC4E8`,
-          plateau: `#263B35`,
-          gridOpacity: 0.25,
-          label: `Active Mode: Satellite Hybrid (High-Contrast Borders & Route Telemetry)`
-        },
-        astro: {
-          ocean: getCssToken(`--map-astro-ocean`),
-          land: getCssToken(`--map-astro-land`),
-          border: `#253659`,
-          plateau: `#131C33`,
-          gridOpacity: 0.18,
-          label: `Active Mode: Dark Stargazing (Low-Glare Bortle-1 Night Sky Overlay)`
-        }
+    function updateInspector(dayNum) {
+      const stop = ROUTE_STOPS.find(s => s.day === dayNum) || ROUTE_STOPS[4];
+      const setTxt = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
       };
+      setTxt(`insp-day-badge`, `${stop.code} · ${stop.date.toUpperCase()}`);
+      setTxt(`insp-title`, stop.title);
+      setTxt(`insp-summary`, stop.highlights);
+      setTxt(`insp-country`, stop.country);
+      setTxt(`insp-province`, stop.province);
+      setTxt(`insp-prefecture`, stop.prefecture);
+      setTxt(`insp-alt`, `${stop.sleepAlt.toLocaleString()} m Sleep / ${stop.passAlt.toLocaleString()} m Peak`);
+      setTxt(`insp-dist`, stop.distanceLabel);
+      setTxt(`insp-coords`, `${stop.lat.toFixed(4)}, ${stop.lng.toFixed(4)}`);
 
-      const cfg = paletteMap[mode] || paletteMap.satellite;
-      if (mapEl) mapEl.style.backgroundColor = cfg.ocean;
-      if (statusEl) statusEl.textContent = cfg.label;
+      ROUTE_STOPS.forEach(s => {
+        const btn = document.getElementById(`jump-day-${s.day}`);
+        if (btn) btn.setAttribute(`aria-pressed`, s.day === dayNum ? `true` : `false`);
+      });
+    }
 
-      if (mapBaseLayer) {
-        mapBaseLayer.setStyle(function (feature) {
-          const isChina = feature && feature.properties && feature.properties.name === `China`;
-          return {
-            fillColor: isChina ? cfg.land : cfg.ocean,
-            fillOpacity: 1,
-            color: cfg.border,
-            weight: isChina ? 1.4 : 0.8
-          };
+    function selectMapDay(dayNum) {
+      appState.selectedDay = dayNum;
+      updateInspector(dayNum);
+      const stop = ROUTE_STOPS.find(s => s.day === dayNum);
+      if (stop && mapInstance) {
+        mapInstance.flyTo([stop.lat, stop.lng], 6, { duration: 0.6 });
+      }
+      persistState();
+    }
+
+    function resetMapBounds() {
+      if (!mapInstance) return;
+      const bounds = L.latLngBounds(ROUTE_STOPS.map(s => [s.lat, s.lng]));
+      mapInstance.fitBounds(bounds, { padding: [36, 36] });
+    }
+
+    function copyPinForStop(dayNum) {
+      const stop = ROUTE_STOPS.find(s => s.day === dayNum) || ROUTE_STOPS[4];
+      const pinText = `${stop.lat.toFixed(4)}, ${stop.lng.toFixed(4)} (${stop.title}, ${stop.prefecture}, ${stop.province}, ${stop.country})`;
+      const fb = document.getElementById(`map-copy-feedback`);
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === `function`) {
+        navigator.clipboard.writeText(pinText).then(() => {
+          if (fb) fb.textContent = `Copied Google Maps GPS pin: ${pinText}`;
+        }).catch(() => {
+          if (fb) fb.textContent = `Google Maps Pin: ${pinText}`;
+        });
+      } else if (fb) {
+        fb.textContent = `Google Maps Pin: ${pinText}`;
+      }
+    }
+
+    function copySelectedPin() {
+      copyPinForStop(appState.selectedDay);
+    }
+
+    function getLayerPalette(mode) {
+      if (mode === `topo-terrain`) {
+        return {
+          ocean: getCssVar(`--map-ocean-topo`),
+          land: getCssVar(`--map-land-topo`),
+          plateau: getCssVar(`--map-plateau-topo`),
+          ridge: getCssVar(`--map-ridge-topo`),
+          border: getCssVar(`--map-border-topo`),
+          showContours: true,
+          showGrid: false,
+          showAdminLabels: true
+        };
+      }
+      if (mode === `street-atlas`) {
+        return {
+          ocean: getCssVar(`--map-ocean-atlas`),
+          land: getCssVar(`--map-land-atlas`),
+          plateau: getCssVar(`--map-plateau-atlas`),
+          ridge: getCssVar(`--map-ridge-atlas`),
+          border: getCssVar(`--map-border-atlas`),
+          showContours: false,
+          showGrid: false,
+          showAdminLabels: true
+        };
+      }
+      if (mode === `hybrid-contours`) {
+        return {
+          ocean: getCssVar(`--map-ocean-sat`),
+          land: getCssVar(`--map-land-sat`),
+          plateau: getCssVar(`--map-plateau-sat`),
+          ridge: getCssVar(`--map-ridge-sat`),
+          border: getCssVar(`--map-border-topo`),
+          showContours: true,
+          showGrid: true,
+          showAdminLabels: true
+        };
+      }
+      if (mode === `stargazing-night`) {
+        return {
+          ocean: getCssVar(`--map-ocean-astro`),
+          land: getCssVar(`--map-land-astro`),
+          plateau: getCssVar(`--map-plateau-astro`),
+          ridge: getCssVar(`--map-ridge-astro`),
+          border: getCssVar(`--map-border-astro`),
+          showContours: false,
+          showGrid: true,
+          showAdminLabels: false
+        };
+      }
+      return {
+        ocean: getCssVar(`--map-ocean-sat`),
+        land: getCssVar(`--map-land-sat`),
+        plateau: getCssVar(`--map-plateau-sat`),
+        ridge: getCssVar(`--map-ridge-sat`),
+        border: getCssVar(`--map-border-sat`),
+        showContours: false,
+        showGrid: true,
+        showAdminLabels: true
+      };
+    }
+
+    function renderMapLayers() {
+      if (!mapInstance || !mapLayersGroup || !routeLayersGroup) return;
+      mapLayersGroup.clearLayers();
+      routeLayersGroup.clearLayers();
+
+      const pal = getLayerPalette(appState.mapLayer);
+      const mapEl = document.getElementById(`expedition-map`);
+      if (mapEl) mapEl.style.background = pal.ocean;
+
+      if (worldCountriesGeo) {
+        L.geoJSON(worldCountriesGeo, {
+          style: feature => {
+            const isChina = feature.properties && feature.properties.name === `China`;
+            return {
+              fillColor: isChina ? pal.land : pal.ocean,
+              fillOpacity: isChina ? 0.95 : 0.65,
+              color: pal.border,
+              weight: isChina ? 1.4 : 0.8
+            };
+          }
+        }).addTo(mapLayersGroup);
+      }
+
+      // Tibetan Plateau & Himalayan vector physiographic layers (public-domain geographic coordinates)
+      const tibetPlateauPoly = [
+        [36.8, 86.0], [37.4, 94.0], [37.0, 102.2], [32.5, 102.5],
+        [28.8, 97.5], [27.6, 91.5], [28.0, 86.5], [31.5, 81.0]
+      ];
+      L.polygon(tibetPlateauPoly, {
+        fillColor: pal.plateau,
+        fillOpacity: 0.55,
+        color: pal.border,
+        weight: 0.8,
+        dashArray: `3 4`
+      }).addTo(mapLayersGroup);
+
+      const himalayaRidgePoly = [
+        [28.5, 85.5], [27.9, 88.2], [28.2, 91.8], [29.4, 95.2],
+        [30.1, 95.0], [29.2, 91.2], [28.7, 87.2]
+      ];
+      L.polygon(himalayaRidgePoly, {
+        fillColor: pal.ridge,
+        fillOpacity: 0.7,
+        color: pal.border,
+        weight: 0.6
+      }).addTo(mapLayersGroup);
+
+      if (pal.showContours) {
+        [
+          { center: [28.14, 86.85], r: 75000, lbl: `5000m+ High Himalaya` },
+          { center: [29.65, 91.17], r: 120000, lbl: `3650m–4800m Central TAR` },
+          { center: [33.01, 91.70], r: 140000, lbl: `4500m–5072m Tanggula` }
+        ].forEach(c => {
+          L.circle(c.center, {
+            radius: c.r,
+            color: getCssVar(`--data-3`),
+            weight: 1,
+            dashArray: `4 4`,
+            fillOpacity: 0.06,
+            fillColor: getCssVar(`--data-3`)
+          }).bindTooltip(c.lbl).addTo(mapLayersGroup);
         });
       }
 
-      if (mapTerrainLayer) {
-        mapTerrainLayer.setStyle({
-          fillColor: cfg.plateau,
-          fillOpacity: mode === `astro` ? 0.35 : 0.52,
-          color: mode === `terrain` ? `#34D399` : cfg.border,
-          weight: mode === `terrain` ? 1.2 : 0.8,
-          dashArray: mode === `terrain` ? `4 4` : null
-        });
+      if (pal.showGrid) {
+        for (let lat = 26; lat <= 38; lat += 4) {
+          L.polyline([[lat, 82], [lat, 106]], {
+            color: pal.border,
+            weight: 0.5,
+            opacity: 0.4
+          }).addTo(mapLayersGroup);
+        }
+        for (let lng = 84; lng <= 106; lng += 4) {
+          L.polyline([[26, lng], [38, lng]], {
+            color: pal.border,
+            weight: 0.5,
+            opacity: 0.4
+          }).addTo(mapLayersGroup);
+        }
       }
 
-      if (mapGridLayer) {
-        mapGridLayer.setStyle({ opacity: cfg.gridOpacity });
+      // Dark-sky Bortle 1 halo for EBC in Stargazing mode
+      if (appState.mapLayer === `stargazing-night`) {
+        L.circle([28.1419, 86.8520], {
+          radius: 95000,
+          color: getCssVar(`--data-3`),
+          weight: 1.5,
+          fillColor: getCssVar(`--data-3`),
+          fillOpacity: 0.14
+        }).bindTooltip(`Rongbuk EBC Dark-Sky Window: 21:47–03:10 AM`).addTo(mapLayersGroup);
       }
+
+      // Flight legs (dashed muted slate — excluded from total km)
+      L.polyline([[30.5728, 104.0668], [29.6489, 94.3615]], {
+        color: getCssVar(`--secondary`),
+        weight: 2,
+        dashArray: `6 6`,
+        opacity: 0.75
+      }).bindTooltip(`Flight: Chengdu → Nyingchi (Excluded from surface distance)`).addTo(routeLayersGroup);
+
+      L.polyline([[36.6171, 101.7782], [30.5728, 104.0668]], {
+        color: getCssVar(`--secondary`),
+        weight: 2,
+        dashArray: `6 6`,
+        opacity: 0.75
+      }).bindTooltip(`Flight: Xining → Chengdu (Excluded from surface distance)`).addTo(routeLayersGroup);
+
+      // Overland driving route (D2 Nyingchi -> Lhasa -> Shigatse -> EBC -> Shigatse -> Lhasa)
+      const driveCoords = [
+        [29.6489, 94.3615],
+        [29.6156, 94.6497],
+        [29.6525, 91.1721],
+        [29.1931, 90.6203],
+        [29.0258, 90.7136],
+        [29.2673, 88.8806],
+        [28.4317, 86.9942],
+        [28.1419, 86.8520],
+        [28.9436, 87.4822],
+        [29.2673, 88.8806],
+        [29.6525, 91.1721]
+      ];
+      L.polyline(driveCoords, {
+        color: getCssVar(`--primary`),
+        weight: 3.5,
+        opacity: 0.95
+      }).bindTooltip(`Overland Driving Route: 2,110 km`).addTo(routeLayersGroup);
+
+      // Qingzang Railway (D9–D10 Lhasa -> Tanggula -> Xining)
+      const railCoords = [
+        [29.6525, 91.1721],
+        [31.4800, 92.0500],
+        [33.0125, 91.7031],
+        [34.2200, 92.4400],
+        [36.4000, 94.9000],
+        [36.6171, 101.7782]
+      ];
+      L.polyline(railCoords, {
+        color: getCssVar(`--tertiary`),
+        weight: 3.5,
+        dashArray: `10 5`,
+        opacity: 0.95
+      }).bindTooltip(`Qingzang Railway: 1,956 km`).addTo(routeLayersGroup);
+
+      // High Mountain Passes
+      INTERMEDIATE_PINS.forEach(p => {
+        L.circleMarker([p.lat, p.lng], {
+          radius: 5,
+          color: getCssVar(`--background`),
+          fillColor: getCssVar(`--data-3`),
+          fillOpacity: 1,
+          weight: 1.5
+        }).bindPopup(`
+          <strong>${p.name}</strong><br>
+          <span>${p.province}, China</span><br>
+          <span>Coordinates: ${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span>
+        `).addTo(routeLayersGroup);
+      });
+
+      // Day 1–10 Primary Markers
+      ROUTE_STOPS.forEach(stop => {
+        const isRail = stop.legType === `rail` || stop.legType === `end`;
+        const fill = stop.day === 5 ? getCssVar(`--data-3`) : (isRail ? getCssVar(`--tertiary`) : getCssVar(`--primary`));
+        const marker = L.circleMarker([stop.lat, stop.lng], {
+          radius: stop.day === 5 ? 9 : 7,
+          color: getCssVar(`--background`),
+          fillColor: fill,
+          fillOpacity: 1,
+          weight: 2
+        }).addTo(routeLayersGroup);
+
+        marker.bindTooltip(`${stop.code}: ${stop.prefecture.split(`,`)[0]} (${stop.sleepAlt} m)`, { direction: `top` });
+        marker.bindPopup(`
+          <div style="min-width: 210px;">
+            <div style="font-family: var(--font-label); font-size: 11px; color: var(--primary); text-transform: uppercase;">${stop.code} · ${stop.date}</div>
+            <strong style="font-size: 14px;">${stop.title}</strong><br>
+            <div style="margin-top: 6px; font-size: 12px; color: var(--on-surface-variant);">
+              <strong>Country:</strong> ${stop.country}<br>
+              <strong>Region:</strong> ${stop.province}<br>
+              <strong>Prefecture:</strong> ${stop.prefecture}<br>
+              <strong>Altitude:</strong> ${stop.sleepAlt.toLocaleString()} m (Peak ${stop.passAlt.toLocaleString()} m)<br>
+              <strong>Coordinates:</strong> ${stop.lat.toFixed(4)}, ${stop.lng.toFixed(4)}
+            </div>
+            <button onclick="copyPinForStop(${stop.day})" style="margin-top: 8px; width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--primary); background: var(--emerald-tint); color: var(--primary); font-family: var(--font-label); font-size: 11px; cursor: pointer;">
+              Copy Google Maps Pin
+            </button>
+          </div>
+        `);
+
+        marker.on(`click`, () => {
+          appState.selectedDay = stop.day;
+          updateInspector(stop.day);
+          persistState();
+        });
+      });
+
+      if (pal.showAdminLabels) {
+        [
+          { name: `SICHUAN PROVINCE`, lat: 31.4, lng: 102.8 },
+          { name: `TIBET AUTONOMOUS REGION (TAR)`, lat: 30.8, lng: 88.8 },
+          { name: `QINGHAI PROVINCE`, lat: 35.6, lng: 96.5 }
+        ].forEach(lbl => {
+          L.marker([lbl.lat, lbl.lng], {
+            interactive: false,
+            icon: L.divIcon({
+              className: `admin-map-label`,
+              html: `<span style="font-family: var(--font-label); font-size: 10px; letter-spacing: 0.08em; color: var(--on-surface-variant); white-space: nowrap; text-shadow: 0 1px 4px var(--background);">${lbl.name}</span>`
+            })
+          }).addTo(mapLayersGroup);
+        });
+      }
+    }
+
+    function changeMapLayer(val) {
+      appState.mapLayer = val;
+      renderMapLayers();
       persistState();
     }
 
     function initMap() {
-      const mapEl = document.getElementById(`expedition-map`);
-      if (!mapEl || typeof L === `undefined`) return;
+      const container = document.getElementById(`expedition-map`);
+      if (!container || typeof L === `undefined`) return;
 
-      leafletMap = L.map(`expedition-map`, {
-        center: [31.2, 95.2],
+      mapInstance = L.map(`expedition-map`, {
+        center: [31.5, 94.5],
         zoom: 5,
         minZoom: 4,
-        maxZoom: 9,
+        maxZoom: 10,
         scrollWheelZoom: true,
         touchZoom: true,
         zoomControl: true
       });
-      leafletMap.attributionControl.addAttribution(`Boundaries: Natural Earth (public domain)`);
 
-      // Build waypoint list UI
-      const wpListEl = document.getElementById(`waypoint-list`);
-      if (wpListEl) {
-        wpListEl.innerHTML = EXPEDITION_DAYS.map(function (wp, idx) {
-          return `<button class="waypoint-btn ${idx === appState.selectedDayIndex ? `active` : ``}" onclick="selectWaypoint(${idx})">
-            <div class="wp-top">
-              <span class="wp-day">${wp.day} &middot; ${wp.date}</span>
-              <span class="wp-elev">${wp.sleepAlt.toLocaleString()} m</span>
-            </div>
-            <div class="wp-name">${wp.title}</div>
-            <div class="wp-meta">${wp.route}</div>
-          </button>`;
-        }).join(``);
-      }
+      mapInstance.attributionControl.addAttribution(`Boundaries: Natural Earth (public domain)`);
+      mapLayersGroup = L.layerGroup().addTo(mapInstance);
+      routeLayersGroup = L.layerGroup().addTo(mapInstance);
 
-      // Load Natural Earth 50m vector geography (approved CDN)
       fetch(`https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json`)
-        .then(function (r) { return r.json(); })
-        .then(function (topo) {
-          if (typeof topojson === `undefined`) return;
-          const countries = topojson.feature(topo, topo.objects.countries);
-
-          mapBaseLayer = L.geoJSON(countries, {
-            style: function (feature) {
-              const isChina = feature && feature.properties && feature.properties.name === `China`;
-              return {
-                fillColor: isChina ? getCssToken(`--map-sat-land`) : getCssToken(`--map-sat-ocean`),
-                fillOpacity: 1,
-                color: `#3E584D`,
-                weight: isChina ? 1.4 : 0.8
-              };
-            }
-          }).addTo(leafletMap);
-
-          // Tibetan Plateau & Himalayan Relief Polygon Overlay (vector contour zone)
-          const plateauPolygon = {
-            type: `FeatureCollection`,
-            features: [
-              {
-                type: `Feature`,
-                properties: { name: `Tibetan Plateau High-Altitude Zone` },
-                geometry: {
-                  type: `Polygon`,
-                  coordinates: [[
-                    [79.0, 34.5], [84.0, 35.8], [91.0, 36.2], [99.0, 35.5],
-                    [101.8, 32.5], [100.5, 29.0], [97.5, 28.2], [93.5, 27.8],
-                    [88.5, 27.4], [85.0, 28.0], [81.0, 29.8], [79.0, 34.5]
-                  ]]
-                }
-              }
-            ]
-          };
-          mapTerrainLayer = L.geoJSON(plateauPolygon, {
-            style: {
-              fillColor: getCssToken(`--map-sat-plateau`),
-              fillOpacity: 0.5,
-              color: `#3E584D`,
-              weight: 0.8
-            }
-          }).addTo(leafletMap);
-
-          // Graticule coordinate lines
-          const gratLines = [];
-          for (let lat = 26; lat <= 38; lat += 2) {
-            gratLines.push([[78, lat], [108, lat]]);
-          }
-          for (let lng = 80; lng <= 106; lng += 4) {
-            gratLines.push([[lng, 26], [lng, 38]]);
-          }
-          mapGridLayer = L.polyline(
-            gratLines.map(function (seg) { return seg.map(function (p) { return [p[1], p[0]]; }); }),
-            { color: `#7CC4E8`, weight: 0.6, opacity: 0.14, interactive: false }
-          ).addTo(leafletMap);
-
-          // Route polylines:
-          // 1. Flight D2 Chengdu -> Nyingchi (dotted sky blue)
-          L.polyline(
-            [[EXPEDITION_DAYS[0].lat, EXPEDITION_DAYS[0].lng], [29.3036, 94.3353], [EXPEDITION_DAYS[1].lat, EXPEDITION_DAYS[1].lng]],
-            { color: getCssToken(`--sky`), weight: 2, dashArray: `4 6`, opacity: 0.85 }
-          ).addTo(leafletMap);
-
-          // 2. Overland Road D2 -> D8 (solid gold)
-          const roadCoords = [
-            [EXPEDITION_DAYS[1].lat, EXPEDITION_DAYS[1].lng],
-            [INTERMEDIATE_LANDMARKS[1].lat, INTERMEDIATE_LANDMARKS[1].lng],
-            [INTERMEDIATE_LANDMARKS[2].lat, INTERMEDIATE_LANDMARKS[2].lng],
-            [EXPEDITION_DAYS[2].lat, EXPEDITION_DAYS[2].lng],
-            [INTERMEDIATE_LANDMARKS[3].lat, INTERMEDIATE_LANDMARKS[3].lng],
-            [INTERMEDIATE_LANDMARKS[4].lat, INTERMEDIATE_LANDMARKS[4].lng],
-            [INTERMEDIATE_LANDMARKS[5].lat, INTERMEDIATE_LANDMARKS[5].lng],
-            [EXPEDITION_DAYS[3].lat, EXPEDITION_DAYS[3].lng],
-            [INTERMEDIATE_LANDMARKS[6].lat, INTERMEDIATE_LANDMARKS[6].lng],
-            [INTERMEDIATE_LANDMARKS[7].lat, INTERMEDIATE_LANDMARKS[7].lng],
-            [EXPEDITION_DAYS[4].lat, EXPEDITION_DAYS[4].lng],
-            [EXPEDITION_DAYS[5].lat, EXPEDITION_DAYS[5].lng],
-            [EXPEDITION_DAYS[6].lat, EXPEDITION_DAYS[6].lng],
-            [EXPEDITION_DAYS[7].lat, EXPEDITION_DAYS[7].lng]
-          ];
-          const roadPoly = L.polyline(roadCoords, {
-            color: getCssToken(`--primary`),
-            weight: 3.5,
-            opacity: 0.95
-          }).addTo(leafletMap);
-
-          // 3. Qingzang Railway D9 -> D10 Lhasa -> Tanggula -> Xining (dashed emerald)
-          const railCoords = [
-            [EXPEDITION_DAYS[7].lat, EXPEDITION_DAYS[7].lng],
-            [31.476, 92.051],
-            [EXPEDITION_DAYS[8].lat, EXPEDITION_DAYS[8].lng],
-            [34.219, 92.443],
-            [36.401, 94.903],
-            [EXPEDITION_DAYS[9].lat, EXPEDITION_DAYS[9].lng]
-          ];
-          const railPoly = L.polyline(railCoords, {
-            color: getCssToken(`--tertiary`),
-            weight: 3,
-            dashArray: `8 5`,
-            opacity: 0.95
-          }).addTo(leafletMap);
-
-          // 4. Return Flight D10 Xining -> Chengdu (dotted sky blue)
-          L.polyline(
-            [[EXPEDITION_DAYS[9].lat, EXPEDITION_DAYS[9].lng], [EXPEDITION_DAYS[0].lat, EXPEDITION_DAYS[0].lng]],
-            { color: getCssToken(`--sky`), weight: 2, dashArray: `4 6`, opacity: 0.85 }
-          ).addTo(leafletMap);
-
-          // Geographic Administrative Hierarchy Labels
-          const adminLabels = [
-            { text: `CHINA`, lat: 35.6, lng: 98.0, cls: `geo-label-country` },
-            { text: `TIBET AUTONOMOUS REGION (TAR)`, lat: 31.3, lng: 88.6, cls: `geo-label-province` },
-            { text: `SICHUAN PROVINCE`, lat: 30.9, lng: 102.2, cls: `geo-label-province` },
-            { text: `QINGHAI PROVINCE`, lat: 35.2, lng: 96.2, cls: `geo-label-province` },
-            { text: `Chengdu · 500m`, lat: 30.25, lng: 104.35, cls: `geo-label-city` },
-            { text: `Nyingchi · 2,900m`, lat: 29.85, lng: 95.15, cls: `geo-label-city` },
-            { text: `Lhasa · 3,650m`, lat: 29.95, lng: 91.15, cls: `geo-label-city` },
-            { text: `Shigatse · 3,840m`, lat: 29.55, lng: 88.65, cls: `geo-label-city` },
-            { text: `Xining · 2,260m`, lat: 36.85, lng: 102.1, cls: `geo-label-city` }
-          ];
-          adminLabels.forEach(function (lbl) {
-            L.marker([lbl.lat, lbl.lng], {
-              interactive: false,
-              icon: L.divIcon({
-                className: ``,
-                html: `<div class="${lbl.cls}">${lbl.text}</div>`,
-                iconSize: [0, 0]
-              })
-            }).addTo(leafletMap);
-          });
-
-          // Day-Based Markers (D1 to D10)
-          dayMarkers = EXPEDITION_DAYS.map(function (wp, idx) {
-            const isEbc = wp.day === `D5`;
-            const marker = L.marker([wp.lat, wp.lng], {
-              icon: L.divIcon({
-                className: ``,
-                html: `<div class="map-day-pin ${isEbc ? `ebc` : ``}">${wp.day}</div>`,
-                iconSize: [28, 28],
-                iconAnchor: [14, 14]
-              })
-            }).addTo(leafletMap);
-
-            const popupHtml = `
-              <div>
-                <div class="popup-day-tag">${wp.day} &middot; ${wp.date}</div>
-                <div class="popup-title">${wp.title}</div>
-                <div><strong>Route:</strong> ${wp.route}</div>
-                <div><strong>Overnight Alt:</strong> ${wp.sleepAlt.toLocaleString()} m &middot; <strong>Pass Peak:</strong> ${wp.passAlt.toLocaleString()} m</div>
-                <div class="popup-gps">Google Maps Query: ${wp.gmapsQuery} (${wp.gpsLabel})</div>
-                <button class="popup-copy-btn" onclick="copyGpsToClipboard('${wp.gpsLabel}', '${wp.gmapsQuery}', this)">Copy GPS for Google Maps</button>
-              </div>
-            `;
-            marker.bindPopup(popupHtml);
-            marker.on(`click`, function () {
-              appState.selectedDayIndex = idx;
-              const items = document.querySelectorAll(`.waypoint-btn`);
-              items.forEach(function (el, i) {
-                if (i === idx) el.classList.add(`active`);
-                else el.classList.remove(`active`);
-              });
-            });
-            return marker;
-          });
-
-          const allGroup = L.featureGroup([roadPoly, railPoly]);
-          mapRouteBounds = allGroup.getBounds();
-          leafletMap.fitBounds(mapRouteBounds, { padding: [36, 36] });
-          setMapMode(appState.mapMode);
-          leafletMap.invalidateSize();
+        .then(r => r.json())
+        .then(topo => {
+          worldCountriesGeo = topojson.feature(topo, topo.objects.countries);
+          renderMapLayers();
+          resetMapBounds();
+          mapInstance.invalidateSize();
         })
-        .catch(function () {
-          // Graceful fallback if offline
-          const statusEl = document.getElementById(`map-mode-status`);
-          if (statusEl) statusEl.textContent = `Vector basemap unavailable offline`;
+        .catch(() => {
+          renderMapLayers();
+          resetMapBounds();
         });
     }
 
-    // =========================================================================
-    // 5. ELEVATION TELEMETRY CHART (Integer Meters Only)
-    // =========================================================================
-    let elevationChart = null;
-
+    /* Telemetry Chart & Table */
     function setTelemetryMode(mode) {
       appState.telemetryMode = mode;
-      const bBoth = document.getElementById(`elev-mode-both`);
-      const bSleep = document.getElementById(`elev-mode-sleep`);
-      if (bBoth) {
-        if (mode === `both`) bBoth.classList.add(`active`);
-        else bBoth.classList.remove(`active`);
-      }
-      if (bSleep) {
-        if (mode === `sleep`) bSleep.classList.add(`active`);
-        else bSleep.classList.remove(`active`);
-      }
-      renderElevationChart();
+      const btnP = document.getElementById(`btn-tel-passes`);
+      const btnS = document.getElementById(`btn-tel-sleeping`);
+      if (btnP) btnP.setAttribute(`aria-pressed`, mode === `passes` ? `true` : `false`);
+      if (btnS) btnS.setAttribute(`aria-pressed`, mode === `sleeping` ? `true` : `false`);
+      renderTelemetryChart();
       persistState();
     }
 
-    function renderElevationChart() {
+    function renderTelemetryChart() {
       const canvas = document.getElementById(`elevation-chart`);
       if (!canvas || typeof Chart === `undefined`) return;
 
-      const labels = EXPEDITION_DAYS.map(function (d) { return d.day; });
-      const sleepData = EXPEDITION_DAYS.map(function (d) { return Math.round(d.sleepAlt); });
-      const passData = EXPEDITION_DAYS.map(function (d) { return Math.round(d.passAlt); });
+      const labels = [
+        `D1 Chengdu`, `D2 Sejila`, `D2 Nyingchi`, `D3 Basum Tso`, `D3 Lhasa`,
+        `D4 Gampala`, `D4 Yamdrok`, `D4 Shigatse`, `D5 Gawula`, `D5 EBC`,
+        `D6 Gyatsola`, `D6 Shigatse`, `D7 Lhasa`, `D8 Lhasa`, `D9 Tanggula`, `D10 Xining`
+      ];
 
-      const gold = getCssToken(`--primary`);
-      const emerald = getCssToken(`--tertiary`);
-      const textMuted = getCssToken(`--on-surface-variant`);
-      const gridColor = getCssToken(`--outline-variant`);
+      const sleepPoints = [
+        500, 2900, 2900, 3480, 3650,
+        3650, 3840, 3840, 5200, 5200,
+        3840, 3840, 3650, 3650, 4500, 2260
+      ];
 
-      const datasets = [
+      const passPoints = [
+        500, 4728, 2900, 3480, 3650,
+        4790, 4441, 3840, 5211, 5200,
+        5248, 3840, 3650, 3650, 5072, 2260
+      ];
+
+      const simpleLabels = ROUTE_STOPS.map(s => `${s.code} ${s.prefecture.split(`,`)[0]}`);
+      const simpleSleep = ROUTE_STOPS.map(s => Math.round(s.sleepAlt));
+
+      const isPasses = appState.telemetryMode === `passes`;
+      const xLabels = isPasses ? labels : simpleLabels;
+      const datasets = isPasses ? [
+        {
+          label: `Peak Mountain Passes & Spots (m)`,
+          data: passPoints,
+          borderColor: getCssVar(`--data-3`),
+          backgroundColor: `rgba(251, 191, 36, 0.12)`,
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: getCssVar(`--data-3`),
+          tension: 0.25,
+          fill: false
+        },
         {
           label: `Overnight Sleeping Altitude (m)`,
-          data: sleepData,
-          borderColor: emerald,
+          data: sleepPoints,
+          borderColor: getCssVar(`--primary`),
           backgroundColor: `rgba(52, 211, 153, 0.14)`,
           borderWidth: 2.5,
+          pointRadius: 4,
+          pointBackgroundColor: getCssVar(`--primary`),
+          tension: 0.25,
+          fill: true
+        }
+      ] : [
+        {
+          label: `Overnight Sleeping Altitude (m)`,
+          data: simpleSleep,
+          borderColor: getCssVar(`--primary`),
+          backgroundColor: `rgba(52, 211, 153, 0.16)`,
+          borderWidth: 3,
           pointRadius: 5,
-          pointHoverRadius: 7,
-          pointBackgroundColor: emerald,
-          fill: true,
-          tension: 0.28
+          pointBackgroundColor: getCssVar(`--primary`),
+          tension: 0.28,
+          fill: true
         }
       ];
 
-      if (appState.telemetryMode === `both`) {
-        datasets.push({
-          label: `Daytime Mountain Pass Peak (m)`,
-          data: passData,
-          borderColor: gold,
-          backgroundColor: `rgba(229, 178, 93, 0.08)`,
-          borderWidth: 2,
-          borderDash: [5, 4],
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          pointBackgroundColor: gold,
-          fill: false,
-          tension: 0.25
-        });
-      }
-
       if (elevationChart) {
-        elevationChart.data.datasets = datasets;
-        elevationChart.update();
-        return;
+        elevationChart.destroy();
       }
 
       elevationChart = new Chart(canvas.getContext(`2d`), {
         type: `line`,
-        data: { labels: labels, datasets: datasets },
+        data: { labels: xLabels, datasets: datasets },
         options: {
           responsive: true,
           maintainAspectRatio: false,
@@ -2136,51 +2249,40 @@
           plugins: {
             legend: {
               labels: {
-                color: getCssToken(`--on-surface`),
-                font: { family: `JetBrains Mono`, size: 12 }
+                color: getCssVar(`--on-surface`),
+                font: { family: `Geist Mono, monospace`, size: 11 }
               }
             },
             tooltip: {
-              backgroundColor: getCssToken(`--surface-container`),
-              titleColor: getCssToken(`--primary`),
-              bodyColor: getCssToken(`--on-surface`),
-              borderColor: getCssToken(`--outline`),
+              backgroundColor: getCssVar(`--surface-container`),
+              borderColor: getCssVar(`--outline`),
               borderWidth: 1,
+              titleColor: getCssVar(`--on-surface`),
+              bodyColor: getCssVar(`--primary`),
               callbacks: {
-                title: function (items) {
-                  const idx = items[0].dataIndex;
-                  const d = EXPEDITION_DAYS[idx];
-                  return d.day + ` (` + d.date + `) — ` + d.title;
-                },
-                label: function (ctx) {
-                  const val = Math.round(ctx.parsed.y);
-                  return ctx.dataset.label + `: ` + val.toLocaleString() + ` m`;
-                },
-                afterBody: function (items) {
-                  const idx = items[0].dataIndex;
-                  const d = EXPEDITION_DAYS[idx];
-                  return [`Pass: ` + d.passName + ` (` + Math.round(d.passAlt).toLocaleString() + ` m)`];
-                }
+                label: ctx => `${ctx.dataset.label}: ${Math.round(ctx.parsed.y)} m`
               }
             }
           },
           scales: {
             x: {
-              ticks: { color: textMuted, font: { family: `JetBrains Mono`, size: 12 } },
-              grid: { color: gridColor }
+              ticks: {
+                color: getCssVar(`--on-surface-variant`),
+                font: { family: `Geist Mono, monospace`, size: 10 },
+                maxRotation: 40
+              },
+              grid: { color: getCssVar(`--outline-variant`) }
             },
             y: {
               min: 0,
-              max: 5800,
+              max: 5600,
               ticks: {
-                color: textMuted,
                 stepSize: 1000,
-                font: { family: `JetBrains Mono`, size: 12 },
-                callback: function (value) {
-                  return Math.round(value).toLocaleString() + ` m`;
-                }
+                color: getCssVar(`--on-surface-variant`),
+                font: { family: `Geist Mono, monospace`, size: 11 },
+                callback: val => `${Math.round(val)} m`
               },
-              grid: { color: gridColor }
+              grid: { color: getCssVar(`--outline-variant`) }
             }
           }
         }
@@ -2190,403 +2292,432 @@
     function renderTelemetryTable() {
       const tbody = document.getElementById(`telemetry-table-body`);
       if (!tbody) return;
-      tbody.innerHTML = EXPEDITION_DAYS.map(function (d) {
-        return `<tr>
-          <td><strong style="color: var(--primary); font-family: var(--font-label);">${d.day}</strong></td>
-          <td>${d.hotel}</td>
-          <td class="num">${Math.round(d.sleepAlt).toLocaleString()} m</td>
-          <td>${d.passName}</td>
-          <td class="num" style="color: var(--primary);">${Math.round(d.passAlt).toLocaleString()} m</td>
-        </tr>`;
-      }).join(``);
+      tbody.innerHTML = ROUTE_STOPS.map(s => `
+        <tr>
+          <td><strong>${s.code}</strong> · ${s.date.replace(`, 2027`, ``)}</td>
+          <td>${s.prefecture} (${s.province})</td>
+          <td class="num">${Math.round(s.passAlt)} m (${s.passName})</td>
+          <td class="num" style="color: var(--primary); font-weight: 600;">${Math.round(s.sleepAlt)} m</td>
+        </tr>
+      `).join(``);
     }
 
-    // =========================================================================
-    // 6. ASTROPHOTOGRAPHY EXPOSURE SIMULATOR (Canvas + 500 Rule)
-    // =========================================================================
-    function setAstroParam(key, val) {
-      appState.astro[key] = val;
-      syncAstroButtons();
-      drawAstroCanvas();
+    /* Astrophotography Simulator */
+    function loadAstroPreset() {
+      appState.astro = { focal: 14, apertureIdx: 1, shutter: 15, isoIdx: 2 };
+      syncAstroControls();
+      updateAstroSim();
+    }
+
+    function syncAstroControls() {
+      const fEl = document.getElementById(`astro-focal`);
+      const aEl = document.getElementById(`astro-aperture`);
+      const sEl = document.getElementById(`astro-shutter`);
+      const iEl = document.getElementById(`astro-iso`);
+      if (fEl) fEl.value = appState.astro.focal;
+      if (aEl) aEl.value = appState.astro.apertureIdx;
+      if (sEl) sEl.value = appState.astro.shutter;
+      if (iEl) iEl.value = appState.astro.isoIdx;
+    }
+
+    function updateAstroSim() {
+      const fEl = document.getElementById(`astro-focal`);
+      const aEl = document.getElementById(`astro-aperture`);
+      const sEl = document.getElementById(`astro-shutter`);
+      const iEl = document.getElementById(`astro-iso`);
+      if (!fEl || !aEl || !sEl || !iEl) return;
+
+      const focal = parseInt(fEl.value, 10);
+      const apertureIdx = parseInt(aEl.value, 10);
+      const shutter = parseInt(sEl.value, 10);
+      const isoIdx = parseInt(iEl.value, 10);
+
+      appState.astro = { focal, apertureIdx, shutter, isoIdx };
+
+      const aperture = APERTURE_STEPS[apertureIdx];
+      const iso = ISO_STEPS[isoIdx];
+      const maxRule = Math.floor(500 / focal);
+
+      const setTxt = (id, v) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = v;
+      };
+
+      setTxt(`val-focal`, `${focal} mm`);
+      setTxt(`val-aperture`, `f/${aperture.toFixed(1)}`);
+      setTxt(`val-shutter`, `${shutter} s`);
+      setTxt(`val-iso`, `ISO ${iso}`);
+      setTxt(`hud-settings`, `${focal}mm · f/${aperture.toFixed(1)} · ${shutter}s · ISO ${iso}`);
+      setTxt(`sim-rule-limit`, `${maxRule} s`);
+
+      const trailRatio = shutter / maxRule;
+      let trailText = `Safe — Pinpoint Stars`;
+      if (trailRatio > 1.0) {
+        trailText = `Warning — Star Trailing (> ${maxRule}s)`;
+      } else if (trailRatio > 0.75) {
+        trailText = `Near Limit — Slight Elongation`;
+      }
+      setTxt(`hud-trail-status`, `${trailText} (500-Rule: ${maxRule}s)`);
+      setTxt(`sim-rule-verdict`, trailText);
+
+      // EV relative to optimal 14mm f/1.8 15s ISO 3200
+      const evDiff = Math.log2(shutter / 15) + Math.log2(iso / 3200) - 2 * Math.log2(aperture / 1.8);
+      let evLabel = `Optimal Core`;
+      let noiseNote = `Balanced Milky Way & Low Noise`;
+      if (evDiff < -1.1) {
+        evLabel = `Underexposed`;
+        noiseNote = `Increase ISO or widen aperture`;
+      } else if (evDiff > 1.2) {
+        evLabel = `Overexposed`;
+        noiseNote = `Bright sky wash; lower ISO or shutter`;
+      } else if (iso >= 6400) {
+        noiseNote = `High ISO grain visible in shadows`;
+      }
+      setTxt(`sim-ev-label`, evLabel);
+      setTxt(`sim-noise-note`, noiseNote);
+
+      drawAstroCanvas(focal, aperture, shutter, iso, evDiff, Math.max(0, (shutter - maxRule * 0.7) / 8));
       persistState();
     }
 
-    function loadRecommendedAstroPreset() {
-      appState.astro = { aperture: 2.8, shutter: 15, iso: 3200 };
-      syncAstroButtons();
-      drawAstroCanvas();
-      persistState();
-    }
-
-    function syncAstroButtons() {
-      const ap = appState.astro.aperture;
-      const sh = appState.astro.shutter;
-      const iso = appState.astro.iso;
-
-      [1.4, 2.8, 4].forEach(function (v) {
-        const el = document.getElementById(`ap-` + v);
-        if (el) {
-          if (v === ap) el.classList.add(`active`);
-          else el.classList.remove(`active`);
-        }
-      });
-      [5, 15, 25, 30].forEach(function (v) {
-        const el = document.getElementById(`sh-` + v);
-        if (el) {
-          if (v === sh) el.classList.add(`active`);
-          else el.classList.remove(`active`);
-        }
-      });
-      [1600, 3200, 6400, 12800].forEach(function (v) {
-        const el = document.getElementById(`iso-` + v);
-        if (el) {
-          if (v === iso) el.classList.add(`active`);
-          else el.classList.remove(`active`);
-        }
-      });
-
-      const vAp = document.getElementById(`val-aperture`);
-      const vSh = document.getElementById(`val-shutter`);
-      const vIso = document.getElementById(`val-iso`);
-      if (vAp) vAp.textContent = `f/` + ap;
-      if (vSh) vSh.textContent = sh + `s`;
-      if (vIso) vIso.textContent = `ISO ` + iso;
-    }
-
-    function drawAstroCanvas() {
+    function drawAstroCanvas(focal, aperture, shutter, iso, evDiff, trailFactor) {
       const canvas = document.getElementById(`astro-canvas`);
       if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      const w = Math.max(320, Math.round(rect.width || 640));
-      const h = Math.max(260, Math.round(rect.height || 360));
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
-      }
-
+      const w = canvas.clientWidth || 560;
+      const h = canvas.clientHeight || 320;
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext(`2d`);
-      const ap = appState.astro.aperture;
-      const sh = appState.astro.shutter;
-      const iso = appState.astro.iso;
 
-      // Compute relative brightness factor vs baseline (f/2.8, 15s, ISO 3200 = 1.0)
-      const apertureGain = Math.pow(2.8 / ap, 2);
-      const shutterGain = sh / 15;
-      const isoGain = iso / 3200;
-      const relExposure = apertureGain * shutterGain * isoGain;
-      const clampedBright = Math.min(2.6, Math.max(0.18, relExposure));
+      const brightnessBoost = Math.max(0.25, Math.min(1.65, 1 + (evDiff || 0) * 0.28));
+      const isoVal = iso || 3200;
+      const trailPx = Math.max(0, Math.min(12, (trailFactor || 0) * 4));
 
-      // Night sky background gradient
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-      const skyLift = Math.min(48, Math.round(clampedBright * 14));
-      bgGrad.addColorStop(0, `rgb(` + (5 + Math.round(skyLift * 0.4)) + `, ` + (9 + Math.round(skyLift * 0.6)) + `, ` + (22 + skyLift) + `)`);
-      bgGrad.addColorStop(0.7, `rgb(` + (12 + Math.round(skyLift * 0.5)) + `, ` + (20 + Math.round(skyLift * 0.7)) + `, ` + (40 + skyLift) + `)`);
-      bgGrad.addColorStop(1, `#070B14`);
-      ctx.fillStyle = bgGrad;
+      // Night sky backdrop
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+      const topBlue = Math.round(12 * brightnessBoost);
+      const horBlue = Math.round(32 * brightnessBoost);
+      skyGrad.addColorStop(0, `rgb(4, ${Math.min(24, topBlue)}, ${Math.min(48, topBlue * 2)})`);
+      skyGrad.addColorStop(1, `rgb(10, ${Math.min(44, horBlue)}, ${Math.min(78, horBlue * 2)})`);
+      ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, w, h);
 
-      // Milky Way diagonal galactic core glow
+      // Diagonal Milky Way Galactic Core band
       ctx.save();
-      ctx.translate(w * 0.55, h * 0.42);
+      ctx.translate(w * 0.56, h * 0.42);
       ctx.rotate(-0.48);
-      const mwAlpha = Math.min(0.85, 0.24 * clampedBright);
-      const mwGrad = ctx.createRadialGradient(0, 0, 12, 0, 0, w * 0.48);
-      mwGrad.addColorStop(0, `rgba(229, 178, 93, ` + (mwAlpha * 0.65).toFixed(2) + `)`);
-      mwGrad.addColorStop(0.35, `rgba(124, 196, 232, ` + (mwAlpha * 0.55).toFixed(2) + `)`);
-      mwGrad.addColorStop(0.65, `rgba(52, 211, 153, ` + (mwAlpha * 0.22).toFixed(2) + `)`);
-      mwGrad.addColorStop(1, `rgba(10, 16, 29, 0)`);
+      const mwGrad = ctx.createRadialGradient(0, 0, 12, 0, 0, w * 0.42);
+      const mwAlpha = Math.max(0.1, Math.min(0.62, 0.34 * brightnessBoost));
+      mwGrad.addColorStop(0, `rgba(251, 191, 36, ${mwAlpha})`);
+      mwGrad.addColorStop(0.35, `rgba(56, 189, 248, ${mwAlpha * 0.7})`);
+      mwGrad.addColorStop(0.75, `rgba(52, 211, 153, ${mwAlpha * 0.25})`);
+      mwGrad.addColorStop(1, `rgba(15, 23, 42, 0)`);
       ctx.fillStyle = mwGrad;
-      ctx.scale(1.6, 0.52);
+      ctx.scale(1.8, 0.55);
       ctx.beginPath();
-      ctx.arc(0, 0, w * 0.42, 0, Math.PI * 2);
+      ctx.arc(0, 0, w * 0.38, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
 
-      // Deterministic pseudo-random stars + 500 Rule trailing when shutter > 20s
-      const trailPx = sh > 20 ? (sh - 18) * 0.85 : 0;
-      const starCount = 190;
+      // Deterministic starfield with star-trailing simulation
+      const fovScale = 14 / (focal || 14);
+      const starCount = Math.round(180 * fovScale);
       for (let i = 0; i < starCount; i++) {
-        const sx = ((Math.sin(i * 12.9898) * 43758.5453) % 1 + 1) % 1 * w;
-        const sy = ((Math.sin(i * 78.233) * 19341.123) % 1 + 1) % 1 * (h * 0.78);
-        const radius = (i % 7 === 0) ? 1.8 : (i % 3 === 0 ? 1.2 : 0.8);
-        const alpha = Math.min(1, (0.35 + (i % 5) * 0.13) * Math.sqrt(clampedBright));
+        const sx = ((i * 7919) % 997) / 997 * w;
+        const sy = ((i * 6271) % 991) / 991 * (h * 0.78);
+        const mag = ((i * 313) % 10) / 10;
+        const alpha = Math.min(1, (0.35 + mag * 0.65) * brightnessBoost);
+        ctx.strokeStyle = i % 7 === 0 ? `rgba(251, 191, 36, ${alpha})` : `rgba(241, 245, 249, ${alpha})`;
+        ctx.lineWidth = mag > 0.75 ? 1.8 : 1;
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx + Math.max(0.8, trailPx), sy + Math.max(0.2, trailPx * 0.35));
+        ctx.stroke();
+      }
 
-        ctx.strokeStyle = i % 9 === 0 ? `rgba(229, 178, 93, ` + alpha.toFixed(2) + `)` : `rgba(242, 236, 225, ` + alpha.toFixed(2) + `)`;
-        ctx.fillStyle = ctx.strokeStyle;
-
-        if (trailPx > 0.5) {
-          ctx.lineWidth = radius * 1.1;
-          ctx.beginPath();
-          ctx.moveTo(sx, sy);
-          ctx.lineTo(sx + trailPx, sy + trailPx * 0.35);
-          ctx.stroke();
-        } else {
-          ctx.beginPath();
-          ctx.arc(sx, sy, radius, 0, Math.PI * 2);
-          ctx.fill();
+      // Subtle ISO noise grain at high ISO
+      if (isoVal >= 6400) {
+        const grainAlpha = isoVal === 12800 ? 0.12 : 0.05;
+        ctx.fillStyle = `rgba(241, 245, 249, ${grainAlpha})`;
+        for (let g = 0; g < (isoVal === 12800 ? 900 : 350); g++) {
+          const gx = ((g * 4999) % 977) / 977 * w;
+          const gy = ((g * 3571) % 967) / 967 * h;
+          ctx.fillRect(gx, gy, 1.2, 1.2);
         }
       }
 
-      // High-ISO noise simulation (visible grain at 6400 / 12800)
-      if (iso >= 6400) {
-        const grainCount = iso === 12800 ? 1400 : 450;
-        ctx.fillStyle = iso === 12800 ? `rgba(255, 255, 255, 0.14)` : `rgba(255, 255, 255, 0.06)`;
-        for (let g = 0; g < grainCount; g++) {
-          const gx = ((Math.sin(g * 91.7) * 51234.5) % 1 + 1) % 1 * w;
-          const gy = ((Math.cos(g * 47.3) * 28374.1) % 1 + 1) % 1 * h;
-          ctx.fillRect(gx, gy, 1.5, 1.5);
-        }
-      }
-
-      // Mt. Everest North Face Silhouette
+      // Mt. Everest North Face Silhouette + Rongbuk Stupa foreground
+      ctx.fillStyle = `#090e1a`;
       ctx.beginPath();
       ctx.moveTo(0, h);
-      ctx.lineTo(0, h * 0.78);
+      ctx.lineTo(0, h * 0.76);
       ctx.lineTo(w * 0.16, h * 0.72);
-      ctx.lineTo(w * 0.32, h * 0.76);
-      ctx.lineTo(w * 0.48, h * 0.53);
-      ctx.lineTo(w * 0.56, h * 0.57);
-      ctx.lineTo(w * 0.65, h * 0.45);
-      ctx.lineTo(w * 0.74, h * 0.61);
-      ctx.lineTo(w * 0.88, h * 0.69);
+      ctx.lineTo(w * 0.31, h * 0.63);
+      ctx.lineTo(w * 0.48, h * 0.44);
+      ctx.lineTo(w * 0.54, h * 0.47);
+      ctx.lineTo(w * 0.67, h * 0.59);
+      ctx.lineTo(w * 0.85, h * 0.68);
       ctx.lineTo(w, h * 0.74);
       ctx.lineTo(w, h);
       ctx.closePath();
-      ctx.fillStyle = `#090F1D`;
       ctx.fill();
 
-      // Subtle moonless starlight rim on Everest summit ridge
+      // Subtle snow ridge rim light
+      ctx.strokeStyle = `rgba(148, 163, 184, ${0.22 * brightnessBoost})`;
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.moveTo(w * 0.48, h * 0.53);
-      ctx.lineTo(w * 0.56, h * 0.57);
-      ctx.lineTo(w * 0.65, h * 0.45);
-      ctx.lineTo(w * 0.74, h * 0.61);
-      ctx.strokeStyle = `rgba(124, 196, 232, ` + Math.min(0.65, 0.25 * clampedBright).toFixed(2) + `)`;
-      ctx.lineWidth = 1.4;
+      ctx.moveTo(w * 0.31, h * 0.63);
+      ctx.lineTo(w * 0.48, h * 0.44);
+      ctx.lineTo(w * 0.54, h * 0.47);
       ctx.stroke();
 
-      // Update HUD & Warning Banner
-      const hudSettings = document.getElementById(`astro-hud-settings`);
-      const hudEv = document.getElementById(`astro-hud-ev`);
-      const warnBox = document.getElementById(`astro-warning-box`);
-      const warnTitle = document.getElementById(`astro-warning-title`);
-      const warnText = document.getElementById(`astro-warning-text`);
-
-      if (hudSettings) {
-        hudSettings.textContent = `M Mode · f/` + ap + ` · ` + sh + `s · ISO ` + iso;
-      }
-
-      let evLabel = `Exposure Gain: Optimal Milky Way Core (` + relExposure.toFixed(1) + `x)`;
-      if (relExposure < 0.55) evLabel = `Underexposed (` + relExposure.toFixed(1) + `x) — Raise ISO or Open Aperture`;
-      else if (relExposure > 2.2) evLabel = `Overexposed Sky Glow (` + relExposure.toFixed(1) + `x) — Lower ISO or Shutter`;
-      if (hudEv) hudEv.textContent = evLabel;
-
-      if (warnBox && warnTitle && warnText) {
-        warnBox.classList.remove(`warning`, `error`);
-        if (sh > 20) {
-          warnBox.classList.add(`error`);
-          warnTitle.textContent = `500 Rule Warning: Star Trailing Detected (>20s)`;
-          warnText.textContent = `At ` + sh + `s on a 20mm lens (500 / 20 = 25s limit; 500 / 24 = 20.8s), Earth's rotation elongates stars into short streaks. Drop shutter to 15–20s for pinpoint stars.`;
-        } else if (iso >= 12800) {
-          warnBox.classList.add(`warning`);
-          warnTitle.textContent = `High-ISO Noise Caution (ISO 12800)`;
-          warnText.textContent = `Pinpoint stars maintained (` + sh + `s), but ISO 12800 introduces heavy shadow noise. Prefer ISO 3200–6400 with f/1.4–f/2.8.`;
-        } else if (relExposure < 0.55) {
-          warnBox.classList.add(`warning`);
-          warnTitle.textContent = `Dim Milky Way Signal`;
-          warnText.textContent = `At f/` + ap + ` and ` + sh + `s, the galactic core appears faint. Use 15s shutter, f/1.4–f/2.8, and ISO 3200–6400.`;
-        } else {
-          warnTitle.textContent = `500 Rule Check: Pinpoint Stars & Balanced Exposure`;
-          warnText.textContent = `Optimal dark-sky balance at f/` + ap + `, ` + sh + `s, ISO ` + iso + `. Sharp stars above Mt. Everest with clean Milky Way dust lanes.`;
-        }
-      }
+      // Glowing Rongbuk Guesthouse camp lantern dot
+      ctx.fillStyle = `rgba(251, 191, 36, 0.85)`;
+      ctx.beginPath();
+      ctx.arc(w * 0.22, h * 0.86, 3, 0, Math.PI * 2);
+      ctx.fill();
     }
 
-    // =========================================================================
-    // 7. ITINERARY ACCORDIONS
-    // =========================================================================
-    function renderItineraryAccordions() {
-      const listEl = document.getElementById(`itinerary-accordion`);
-      if (!listEl) return;
-
-      listEl.innerHTML = EXPEDITION_DAYS.map(function (d, idx) {
-        const distText = d.mode === `flight` ? `Flight Leg (Excluded from Total)`
-          : d.mode === `rail` ? d.distanceKm.toLocaleString() + ` km (Qingzang Rail)`
-          : d.distanceKm.toLocaleString() + ` km (Overland)`;
-
-        return `<article class="acc-card ${idx === 1 || idx === 4 ? `open` : ``}" id="acc-day-${idx}">
-          <button class="acc-trigger" aria-expanded="${idx === 1 || idx === 4 ? `true` : `false`}" onclick="toggleDayAccordion(${idx})">
-            <div class="acc-head-main">
-              <span class="acc-day-badge">${d.day} &middot; ${d.date}</span>
-              <span class="acc-title">${d.title}</span>
-            </div>
-            <div class="acc-meta-chips">
-              <span>Sleep: ${d.sleepAlt.toLocaleString()} m</span>
-              <span>&middot;</span>
-              <span>${distText}</span>
-            </div>
-          </button>
-          <div class="acc-body">
-            <p style="margin:0; color: var(--on-surface);">${d.highlights}</p>
-            <div class="acc-detail-grid">
-              <div class="detail-block">
-                <div class="kpi-label">Route &amp; Transit</div>
-                <div>${d.route}</div>
-              </div>
-              <div class="detail-block">
-                <div class="kpi-label">Meals</div>
-                <div style="color: var(--primary);">${d.meals}</div>
-              </div>
-              <div class="detail-block">
-                <div class="kpi-label">Accommodation</div>
-                <div>${d.hotel}</div>
-              </div>
-              <div class="detail-block">
-                <div class="kpi-label">Elevation &amp; Google Maps GPS</div>
-                <div>Pass: ${d.passName} (${d.passAlt.toLocaleString()} m)</div>
-                <div style="color: var(--sky); font-family: var(--font-label); font-size: var(--label-size); margin-top: 4px;">${d.gmapsQuery} (${d.gpsLabel})</div>
-              </div>
-            </div>
-          </div>
-        </article>`;
-      }).join(``);
+    function renderAstroChecklist() {
+      const container = document.getElementById(`astro-checklist`);
+      if (!container) return;
+      container.innerHTML = CHECKLIST_ITEMS.map(item => `
+        <label class="checklist-item">
+          <input type="checkbox" ${appState.checklist[item.id] ? `checked` : ``} onchange="toggleChecklistItem('${item.id}', this.checked)">
+          <span style="font-size: var(--label-size); color: var(--on-surface);">${item.label}</span>
+        </label>
+      `).join(``);
     }
 
-    // =========================================================================
-    // 8. EXPENSE CALCULATOR & PREP CHECKLIST
-    // =========================================================================
-    function setRoomType(type) {
-      appState.roomType = type;
-      const bTwin = document.getElementById(`room-twin`);
-      const bSingle = document.getElementById(`room-single`);
-      if (bTwin) {
-        if (type === `twin`) bTwin.classList.add(`active`);
-        else bTwin.classList.remove(`active`);
-      }
-      if (bSingle) {
-        if (type === `single`) bSingle.classList.add(`active`);
-        else bSingle.classList.remove(`active`);
-      }
-      updateExpenseEstimator();
+    function toggleChecklistItem(id, checked) {
+      appState.checklist[id] = checked;
       persistState();
     }
 
-    function updateExpenseEstimator() {
-      const mealEl = document.getElementById(`input-meal-rate`);
-      const extraEl = document.getElementById(`input-extra-allowance`);
-      const rateEl = document.getElementById(`input-sgd-rate`);
+    /* Itinerary Accordions */
+    function renderItinerary() {
+      const container = document.getElementById(`itinerary-accordion`);
+      if (!container) return;
+      container.innerHTML = ROUTE_STOPS.map(stop => {
+        const isOpen = appState.expandedDays.includes(stop.day);
+        return `
+          <article class="accordion-item ${isOpen ? `open` : ``}" id="itin-day-${stop.day}">
+            <button class="accordion-trigger" aria-expanded="${isOpen ? `true` : `false`}" onclick="toggleDayAccordion(${stop.day})">
+              <div class="accordion-title-group">
+                <span class="accordion-day-tag">${stop.code} · ${stop.date} · ${stop.province}</span>
+                <span class="accordion-heading">${stop.title}</span>
+              </div>
+              <div class="accordion-right">
+                <span class="chip chip-emerald chip-hide-sm">${stop.sleepAlt.toLocaleString()} m Sleep</span>
+                <span class="chip chip-hide-sm">${stop.distanceLabel}</span>
+                <i data-lucide="chevron-down" width="18" height="18" class="accordion-chevron" aria-hidden="true"></i>
+              </div>
+            </button>
+            <div class="accordion-body">
+              <p style="margin: 0; color: var(--on-surface);">${stop.highlights}</p>
+              <div class="admin-hierarchy">
+                <div class="admin-row">
+                  <span class="admin-key">Country / Province</span>
+                  <span class="admin-val">${stop.country} · ${stop.province}</span>
+                </div>
+                <div class="admin-row">
+                  <span class="admin-key">City / Prefecture</span>
+                  <span class="admin-val">${stop.prefecture}</span>
+                </div>
+                <div class="admin-row">
+                  <span class="admin-key">Elevation Profile</span>
+                  <span class="admin-val">${stop.sleepAlt.toLocaleString()} m Sleep · ${stop.passAlt.toLocaleString()} m Peak (${stop.passName})</span>
+                </div>
+                <div class="admin-row">
+                  <span class="admin-key">Meals</span>
+                  <span class="admin-val">${stop.meals}</span>
+                </div>
+                <div class="admin-row">
+                  <span class="admin-key">Accommodation</span>
+                  <span class="admin-val">${stop.hotel}</span>
+                </div>
+              </div>
+              <div class="btn-pill-group">
+                <button class="btn" onclick="jumpToDayOnMap(${stop.day})">
+                  <i data-lucide="map-pin" width="15" height="15" aria-hidden="true"></i>
+                  <span>View on Map</span>
+                </button>
+                <button class="btn" onclick="copyPinForStop(${stop.day})">
+                  <i data-lucide="copy" width="15" height="15" aria-hidden="true"></i>
+                  <span>Copy GPS (${stop.lat.toFixed(4)}, ${stop.lng.toFixed(4)})</span>
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join(``);
+      if (window.lucide) lucide.createIcons();
+    }
 
-      const mealRate = mealEl ? Math.max(0, Number(mealEl.value) || 0) : 30;
-      const extra = extraEl ? Math.max(0, Number(extraEl.value) || 0) : 300;
-      const sgdRate = rateEl ? Math.max(1, Number(rateEl.value) || 5.4) : 5.4;
+    function toggleDayAccordion(dayNum) {
+      const idx = appState.expandedDays.indexOf(dayNum);
+      if (idx >= 0) {
+        appState.expandedDays.splice(idx, 1);
+      } else {
+        appState.expandedDays.push(dayNum);
+      }
+      renderItinerary();
+      persistState();
+    }
 
-      appState.mealRate = mealRate;
-      appState.extraAllowance = extra;
-      appState.sgdRate = sgdRate;
+    function toggleAllDays(expand) {
+      appState.expandedDays = expand ? ROUTE_STOPS.map(s => s.day) : [];
+      renderItinerary();
+      persistState();
+    }
 
-      const basePackageRmb = 9000;
-      const singleSuppRmb = appState.roomType === `single` ? 1100 : 0;
-      const selfPaidMealsRmb = 16 * mealRate;
+    function jumpToDayOnMap(dayNum) {
+      switchTab(`map`);
+      setTimeout(() => {
+        selectMapDay(dayNum);
+      }, 100);
+    }
+
+    /* Expenses Calculator */
+    function toggleSingleRoom() {
+      appState.expenses.singleRoom = !appState.expenses.singleRoom;
+      updateExpenses();
+    }
+
+    function updateExpenses() {
+      const extraSlider = document.getElementById(`extra-meal-slider`);
+      const rateInput = document.getElementById(`sgd-rate-input`);
+      const singleBtn = document.getElementById(`btn-single-room`);
+      const singleLbl = document.getElementById(`lbl-single-status`);
+
+      if (extraSlider) appState.expenses.extraAllowance = parseInt(extraSlider.value, 10) || 0;
+      if (rateInput) {
+        const parsedRate = parseFloat(rateInput.value);
+        if (!isNaN(parsedRate) && parsedRate >= 3.0) appState.expenses.sgdRate = parsedRate;
+      }
+
+      const rate = appState.expenses.sgdRate;
+      const basePkg = 9000;
+      const singleFee = appState.expenses.singleRoom ? 1100 : 0;
+      const pkgTotalRmb = basePkg + singleFee;
+      const mealsBaseRmb = 16 * 30;
+      const extraRmb = appState.expenses.extraAllowance;
+      const mealsTotalRmb = mealsBaseRmb + extraRmb;
       const airfareSgd = 400;
-      const airfareRmb = Math.round(airfareSgd * sgdRate);
+      const airfareRmb = Math.round(airfareSgd * rate);
 
-      const totalRmbExclAir = basePackageRmb + singleSuppRmb + selfPaidMealsRmb + extra;
-      const totalSgdInclAir = Math.round(totalRmbExclAir / sgdRate) + airfareSgd;
+      const grandRmb = pkgTotalRmb + mealsTotalRmb + airfareRmb;
+      const grandSgd = Math.round(pkgTotalRmb / rate + mealsTotalRmb / rate + airfareSgd);
 
-      const rows = [
-        { label: `Base Tour Package (Twin Sharing)`, rmb: basePackageRmb, sgd: Math.round(basePackageRmb / sgdRate) },
-        { label: `Single Room Supplement Add-on`, rmb: singleSuppRmb, sgd: Math.round(singleSuppRmb / sgdRate) },
-        { label: `16 Self-Paid Meals (` + mealRate + ` RMB/meal)`, rmb: selfPaidMealsRmb, sgd: Math.round(selfPaidMealsRmb / sgdRate) },
-        { label: `Extra Allowance (Drinks & Add-on Dishes)`, rmb: extra, sgd: Math.round(extra / sgdRate) },
-        { label: `Airfare Ticket Price (Benchmark)`, rmb: airfareRmb, sgd: airfareSgd }
-      ];
+      if (singleBtn) singleBtn.setAttribute(`aria-pressed`, appState.expenses.singleRoom ? `true` : `false`);
+      if (singleLbl) singleLbl.textContent = appState.expenses.singleRoom ? `Private Single (+1,100)` : `Twin Sharing`;
+
+      const setTxt = (id, v) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = v;
+      };
+
+      setTxt(`val-extra-rmb`, `${extraRmb} RMB`);
+      setTxt(`exp-pkg-rmb`, `${pkgTotalRmb.toLocaleString()} RMB`);
+      setTxt(`exp-pkg-note`, appState.expenses.singleRoom ? `Base 9,000 + 1,100 Single Supp.` : `Twin Sharing Base Rate`);
+      setTxt(`exp-meals-rmb`, `${mealsTotalRmb.toLocaleString()} RMB`);
+      setTxt(`exp-grand-sgd`, `SGD ${grandSgd.toLocaleString()}`);
+      setTxt(`exp-grand-rmb`, `≈ ${grandRmb.toLocaleString()} RMB Combined`);
 
       const tbody = document.getElementById(`expense-table-body`);
       if (tbody) {
-        let html = rows.map(function (r) {
-          return `<tr>
-            <td>${r.label}</td>
-            <td class="num">${r.rmb.toLocaleString()}</td>
+        const rows = [
+          {
+            cat: `Base Tour Package (Twin Sharing)`,
+            note: `Permits (TTP/ATP), 4-star oxygenated hotels, Rongbuk 5200m stay (0 RMB upgrade), Qingzang soft-sleeper, Chengdu–Nyingchi & Xining–Chengdu flights, entry tickets, vehicle, guide & driver tips.`,
+            rmb: basePkg,
+            sgd: Math.round(basePkg / rate)
+          },
+          {
+            cat: `Single Room Supplement`,
+            note: appState.expenses.singleRoom ? `Active: Private single room throughout all hotels` : `Not selected (Twin-sharing standard room)`,
+            rmb: singleFee,
+            sgd: Math.round(singleFee / rate)
+          },
+          {
+            cat: `16 Self-Paid Lunches & Dinners`,
+            note: `Calculated at 30 RMB per meal (Day 2 Lulang Stone Pot Chicken, Day 5 Everest Hot Pot & Day 8 Potala Tea are gifted)`,
+            rmb: mealsBaseRmb,
+            sgd: Math.round(mealsBaseRmb / rate)
+          },
+          {
+            cat: `Optional Drinks & Add-on Dishes`,
+            note: `Adjustable personal buffer for specialty drinks, snacks, and shared extra dishes`,
+            rmb: extraRmb,
+            sgd: Math.round(extraRmb / rate)
+          },
+          {
+            cat: `Chengdu International / Regional Airfare`,
+            note: `Return ticket to/from Chengdu (TFU / CTU)`,
+            rmb: airfareRmb,
+            sgd: airfareSgd
+          }
+        ];
+
+        tbody.innerHTML = rows.map(r => `
+          <tr>
+            <td><strong>${r.cat}</strong></td>
+            <td style="color: var(--on-surface-variant);">${r.note}</td>
+            <td class="num">${r.rmb.toLocaleString()} RMB</td>
             <td class="num">SGD ${r.sgd.toLocaleString()}</td>
-          </tr>`;
-        }).join(``);
-        html += `<tr style="background: var(--surface-container-high);">
-          <td><strong style="color: var(--primary);">Estimated All-In Per Person</strong></td>
-          <td class="num"><strong style="color: var(--primary);">${(totalRmbExclAir + airfareRmb).toLocaleString()} RMB</strong></td>
-          <td class="num"><strong style="color: var(--tertiary);">SGD ${totalSgdInclAir.toLocaleString()}</strong></td>
-        </tr>`;
-        tbody.innerHTML = html;
+          </tr>
+        `).join(``) + `
+          <tr style="background: var(--emerald-tint);">
+            <td><strong style="color: var(--primary);">Estimated Total Per Person</strong></td>
+            <td style="color: var(--on-surface);">At ${rate.toFixed(2)} RMB / SGD</td>
+            <td class="num"><strong style="color: var(--primary);">${grandRmb.toLocaleString()} RMB</strong></td>
+            <td class="num"><strong style="color: var(--primary);">SGD ${grandSgd.toLocaleString()}</strong></td>
+          </tr>
+        `;
       }
+
       persistState();
     }
 
-    function toggleCheckItem(id) {
-      appState.checklist[id] = !appState.checklist[id];
-      persistState();
-    }
-
-    function renderChecklist() {
-      const container = document.getElementById(`prep-checklist`);
-      if (!container) return;
-      container.innerHTML = CHECKLIST_ITEMS.map(function (item) {
-        const checked = appState.checklist[item.id] ? `checked` : ``;
-        return `<label class="check-row">
-          <input type="checkbox" ${checked} onchange="toggleCheckItem('${item.id}')">
-          <span style="font-size: 0.875rem;">${item.text}</span>
-        </label>`;
-      }).join(``);
-    }
-
-    // =========================================================================
-    // 9. INITIALIZATION & STATE RESTORE
-    // =========================================================================
+    /* Bootstrap & State Restoration */
     async function initDashboard() {
       if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
         try {
           const saved = await window.notebookAppApi.getAppState();
           if (saved && typeof saved === `object`) {
-            if (saved.activeTab) appState.activeTab = saved.activeTab;
-            if (saved.mapMode) appState.mapMode = saved.mapMode;
-            if (typeof saved.selectedDayIndex === `number`) appState.selectedDayIndex = saved.selectedDayIndex;
-            if (saved.telemetryMode) appState.telemetryMode = saved.telemetryMode;
+            appState = Object.assign({}, appState, saved);
             if (saved.astro) appState.astro = Object.assign({}, appState.astro, saved.astro);
-            if (saved.roomType) appState.roomType = saved.roomType;
-            if (typeof saved.mealRate === `number`) appState.mealRate = saved.mealRate;
-            if (typeof saved.extraAllowance === `number`) appState.extraAllowance = saved.extraAllowance;
-            if (typeof saved.sgdRate === `number`) appState.sgdRate = saved.sgdRate;
-            if (saved.checklist) appState.checklist = saved.checklist;
+            if (saved.expenses) appState.expenses = Object.assign({}, appState.expenses, saved.expenses);
+            if (saved.checklist) appState.checklist = Object.assign({}, appState.checklist, saved.checklist);
           }
         } catch (e) {
-          // Proceed with defaults
+          // Proceed with default state
         }
       }
 
-      const mealEl = document.getElementById(`input-meal-rate`);
-      const extraEl = document.getElementById(`input-extra-allowance`);
-      const rateEl = document.getElementById(`input-sgd-rate`);
-      if (mealEl) mealEl.value = appState.mealRate;
-      if (extraEl) extraEl.value = appState.extraAllowance;
-      if (rateEl) rateEl.value = appState.sgdRate;
+      const layerSel = document.getElementById(`map-layer-select`);
+      if (layerSel) layerSel.value = appState.mapLayer;
 
+      const extraSlider = document.getElementById(`extra-meal-slider`);
+      if (extraSlider) extraSlider.value = appState.expenses.extraAllowance;
+
+      const rateInput = document.getElementById(`sgd-rate-input`);
+      if (rateInput) rateInput.value = appState.expenses.sgdRate.toFixed(2);
+
+      initDayJumpStrip();
+      updateInspector(appState.selectedDay);
       initMap();
-      renderElevationChart();
-      renderTelemetryTable();
-      syncAstroButtons();
-      drawAstroCanvas();
-      renderItineraryAccordions();
-      renderChecklist();
-      setRoomType(appState.roomType);
       setTelemetryMode(appState.telemetryMode);
+      renderTelemetryTable();
+      syncAstroControls();
+      updateAstroSim();
+      renderAstroChecklist();
+      renderItinerary();
+      updateExpenses();
       switchTab(appState.activeTab);
 
-      window.addEventListener(`resize`, function () {
-        if (appState.activeTab === `astro`) drawAstroCanvas();
-        if (appState.activeTab === `map` && leafletMap) leafletMap.invalidateSize();
-      });
+      if (window.lucide) lucide.createIcons();
 
-      if (typeof lucide !== `undefined` && lucide.createIcons) {
-        lucide.createIcons();
-      }
       if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
         window.notebookAppApi.notifyAppReady();
       }
